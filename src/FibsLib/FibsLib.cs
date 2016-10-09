@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MinimalisticTelnet;
@@ -7,7 +8,9 @@ namespace Fibs {
   // FIBS Client Protocol Detailed Specification: http://www.fibs.com/fibs_interface.html
   // Known hosts: fibs.com:4321 (default), tigergammon.com:4321
   public class FibsLib : IDisposable {
+    static string FibsVersion = "1008";
     TelnetConnection telnet;
+    CookieMonster monster = new CookieMonster();
 
     public FibsLib(string host = "fibs.com", int port = 4321) {
       // from https://github.com/9swampy/Telnet/
@@ -16,39 +19,36 @@ namespace Fibs {
     }
 
     public async Task Login(string user, string pw) {
-      await ExpectAsync("login:");
-      await WriteLineAsync($"login dotnetcli 1008 {user} {pw}");
+      await ExpectAsync(FibsCookie.FIBS_LoginPrompt);
+      await WriteLineAsync($"login dotnetcli {FibsVersion} {user} {pw}");
       await ReadAllAsync();
     }
 
-    Task WriteLineAsync(string line) {
-      return telnet.WriteLineAsync(line);
-    }
+    // Use ToArray instead of yield return to make sure all messages in this string
+    // are processed. yield return will stop in the middle if all of the messages
+    // aren't pulled.
+    IEnumerable<CookieMessage> Process(string s) =>
+      s.Split(new string[] { "\r\n" }, StringSplitOptions.None).Select(l => monster.EatCookie(l)).ToArray();
 
-    async Task ExpectAsync(string terminator, int timeout = 5000) {
+    Task WriteLineAsync(string line) => telnet.WriteLineAsync(line);
+
+    async Task ExpectAsync(FibsCookie cookie, int timeout = 5000) {
       var start = DateTime.Now;
       var span = new TimeSpan(0, 0, 0, 0, timeout);
       while (DateTime.Now - start < span) {
-        var s = await telnet.ReadAsync(100);
-        Console.Write(s);
-        if (s.TrimEnd().EndsWith(terminator)) { return; }
+        var s = await telnet.ReadAsync(1);
+        var cookieMessages = Process(s);
+        if (cookieMessages.Any(cm => cm.Cookie == cookie)) { return; }
       }
 
-      throw new Exception($"{terminator} not found");
+      throw new Exception($"{cookie} not found");
     }
 
     async Task ReadAllAsync() {
       while (true) {
         var s = await telnet.ReadAsync(1000);
+        Process(s);
         if (string.IsNullOrEmpty(s)) { break; }
-        // TODO: distinquish between a new login and losing a connection in the middle
-        if (s.Trim() == "login:") { throw new Exception("invalid username/password"); }
-
-        var lines = s.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries).Select(l => l.Trim());
-        foreach (var line in lines) {
-          Console.WriteLine("'" + line + "'");
-          var cm = ClipBase.Parse(line);
-        }
       }
     }
 
