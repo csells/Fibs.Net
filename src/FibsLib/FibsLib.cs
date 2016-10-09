@@ -7,12 +7,12 @@ using MinimalisticTelnet;
 namespace Fibs {
   // FIBS Client Protocol Detailed Specification: http://www.fibs.com/fibs_interface.html
   // Known hosts: fibs.com:4321 (default), tigergammon.com:4321
-  public class FibsLib : IDisposable {
+  public class FibsSession : IDisposable {
     static string FibsVersion = "1008";
     TelnetConnection telnet;
     CookieMonster monster = new CookieMonster();
 
-    public FibsLib(string host = "fibs.com", int port = 4321) {
+    public FibsSession(string host = "fibs.com", int port = 4321) {
       // from https://github.com/9swampy/Telnet/
       telnet = new TelnetConnection(host, port);
       if (!telnet.IsConnected) { throw new Exception($"cannot connect to {host} on {port}"); }
@@ -21,7 +21,7 @@ namespace Fibs {
     public async Task Login(string user, string pw) {
       await ExpectAsync(FibsCookie.FIBS_LoginPrompt);
       await WriteLineAsync($"login dotnetcli {FibsVersion} {user} {pw}");
-      await ReadAllAsync();
+      await ExpectAsync(FibsCookie.CLIP_MOTD_END);
     }
 
     // Use ToArray instead of yield return to make sure all messages in this string
@@ -44,16 +44,8 @@ namespace Fibs {
       throw new Exception($"{cookie} not found");
     }
 
-    async Task ReadAllAsync() {
-      while (true) {
-        var s = await telnet.ReadAsync(1000);
-        Process(s);
-        if (string.IsNullOrEmpty(s)) { break; }
-      }
-    }
-
     // clean up, clean up, everybody do their share...
-    ~FibsLib() { ((IDisposable)this).Dispose(); }
+    ~FibsSession() { ((IDisposable)this).Dispose(); }
     void IDisposable.Dispose() { if (telnet != null) { telnet.Dispose(); telnet = null; } }
   }
 

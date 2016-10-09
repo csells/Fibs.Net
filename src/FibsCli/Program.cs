@@ -13,7 +13,7 @@ namespace Fibs {
       var user = "dotnetcli";
       var pw = "dotnetcli1";
 
-      using (var fibs = new FibsLib()) {
+      using (var fibs = new FibsSession()) {
         fibs.Login(user, pw).Sync();
         Console.Write("[Enter]");
         Console.ReadLine();

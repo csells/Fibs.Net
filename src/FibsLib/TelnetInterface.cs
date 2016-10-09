@@ -28,7 +28,7 @@ namespace MinimalisticTelnet {
 
     public TelnetConnection(string host, int port) {
       tcpSocket = new TcpClient();
-      tcpSocket.ConnectAsync(host, port).GetAwaiter().GetResult();
+      tcpSocket.Client.Connect(host, port);
     }
 
     public async Task<string> Login(string user, string pw, int timeout) {
@@ -60,11 +60,16 @@ namespace MinimalisticTelnet {
 
     public async Task<string> ReadAsync(int timeout) {
       if (!tcpSocket.Connected) { throw new Exception("not connected"); }
-      StringBuilder sb = new StringBuilder();
-      do {
+
+      var start = DateTime.Now;
+      var span = new TimeSpan(0, 0, 0, 0, timeout);
+      var sb = new StringBuilder();
+
+      while (DateTime.Now - start < span) {
         ParseTelnet(sb);
-        await Task.Delay(timeout);
-      } while (tcpSocket.Available > 0);
+        await Task.Delay(1);
+      }
+
       return sb.ToString();
     }
 
