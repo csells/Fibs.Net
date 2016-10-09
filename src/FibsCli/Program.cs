@@ -1,22 +1,19 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Fibs {
-  public static class AsyncHacks {
-    public static void Sync(this Task task) { task.GetAwaiter().GetResult(); }
-    public static T Sync<T>(this Task<T> task) => task.GetAwaiter().GetResult();
-  }
-
   class Program {
     static void Main(string[] args) {
-      // FIBS test user
-      var user = "dotnetcli";
-      var pw = "dotnetcli1";
+      (new Program()).RunAsync(args).GetAwaiter().GetResult();
+    }
 
-      using (var fibs = new FibsSession()) {
-        fibs.Login(user, pw).Sync();
-        Console.Write("[Enter]");
-        Console.ReadLine();
+    // FIBS test user
+    string user = "dotnetcli";
+    string pw = "dotnetcli1";
+    FibsSession fibs;
+
+    async Task RunAsync(string[] args) {
+      using (fibs = new FibsSession()) {
+        await fibs.Login(user, pw);
       }
     }
   }

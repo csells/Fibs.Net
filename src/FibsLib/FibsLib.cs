@@ -18,6 +18,11 @@ namespace Fibs {
       if (!telnet.IsConnected) { throw new Exception($"cannot connect to {host} on {port}"); }
     }
 
+    public bool IsConnected { get { return telnet.IsConnected; } }
+
+    public async Task<IEnumerable<CookieMessage>> ReadMessagesAsync(int timeout = 5000) =>
+      Process(await telnet.ReadAsync(timeout));
+
     public async Task Login(string user, string pw) {
       await ExpectAsync(FibsCookie.FIBS_LoginPrompt);
       await WriteLineAsync($"login dotnetcli {FibsVersion} {user} {pw}");
@@ -30,7 +35,7 @@ namespace Fibs {
     IEnumerable<CookieMessage> Process(string s) =>
       s.Split(new string[] { "\r\n" }, StringSplitOptions.None).Select(l => monster.EatCookie(l)).ToArray();
 
-    Task WriteLineAsync(string line) => telnet.WriteLineAsync(line);
+    public Task WriteLineAsync(string line) => telnet.WriteLineAsync(line);
 
     async Task ExpectAsync(FibsCookie cookie, int timeout = 5000) {
       var start = DateTime.Now;
