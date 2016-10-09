@@ -1386,7 +1386,11 @@
           "lib/portable-net45+win8+wpa81/_._": {}
         },
         "runtimeTargets": {
-          "runtimes/win/lib/netstandard1.3/_._": {
+          "runtimes/unix/lib/netstandard1.3/System.IO.Compression.dll": {
+            "assetType": "runtime",
+            "rid": "unix"
+          },
+          "runtimes/win/lib/netstandard1.3/System.IO.Compression.dll": {
             "assetType": "runtime",
             "rid": "win"
           }
@@ -1409,7 +1413,7 @@
           "ref/netstandard1.3/System.IO.Compression.ZipFile.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.3/_._": {}
+          "lib/netstandard1.3/System.IO.Compression.ZipFile.dll": {}
         }
       },
       "System.IO.FileSystem/4.0.1": {
@@ -1644,7 +1648,11 @@
           "lib/portable-net45+win8+wpa81/_._": {}
         },
         "runtimeTargets": {
-          "runtimes/win/lib/netstandard1.3/_._": {
+          "runtimes/unix/lib/netstandard1.6/System.Net.Http.dll": {
+            "assetType": "runtime",
+            "rid": "unix"
+          },
+          "runtimes/win/lib/netstandard1.3/System.Net.Http.dll": {
             "assetType": "runtime",
             "rid": "win"
           }
@@ -2492,7 +2500,7 @@
           "ref/netstandard1.6/System.Text.RegularExpressions.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.6/_._": {}
+          "lib/netstandard1.6/System.Text.RegularExpressions.dll": {}
         }
       },
       "System.Threading/4.0.11": {
@@ -2658,7 +2666,7 @@
           "ref/netstandard1.3/System.Xml.ReaderWriter.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.3/_._": {}
+          "lib/netstandard1.3/System.Xml.ReaderWriter.dll": {}
         }
       },
       "System.Xml.XDocument/4.0.11": {
@@ -2681,7 +2689,7 @@
           "ref/netstandard1.3/System.Xml.XDocument.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.3/_._": {}
+          "lib/netstandard1.3/System.Xml.XDocument.dll": {}
         }
       },
       "System.Xml.XmlDocument/4.0.1": {
@@ -2743,6 +2751,19 @@
         },
         "runtime": {
           "lib/netstandard1.3/_._": {}
+        }
+      },
+      "FibsLib/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.6",
+        "dependencies": {
+          "NETStandard.Library": "1.6.0"
+        },
+        "compile": {
+          "netstandard1.6/FibsLib.dll": {}
+        },
+        "runtime": {
+          "netstandard1.6/FibsLib.dll": {}
         }
       }
     }
@@ -7851,10 +7872,16 @@
         "ref/xamarintvos10/_._",
         "ref/xamarinwatchos10/_._"
       ]
+    },
+    "FibsLib/1.0.0": {
+      "type": "project",
+      "path": "../FibsLib/project.json",
+      "msbuildProject": "../FibsLib/FibsLib.xproj"
     }
   },
   "projectFileDependencyGroups": {
     "": [
+      "FibsLib >= 1.0.0-*",
       "Microsoft.AspNetCore.Diagnostics >= 1.0.0",
       "Microsoft.AspNetCore.Server.IISIntegration >= 1.0.0",
       "Microsoft.AspNetCore.Server.Kestrel >= 1.0.1",
