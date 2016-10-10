@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -10,20 +9,19 @@ namespace Fibs {
     }
 
     FibsSession fibs;
-    Dictionary<int, string> TaskTags = new Dictionary<int, string>();
+    Task<string> consoleInputTask;
+    Task<CookieMessage[]> fibsInputTask;
 
     Task<string> GetConsoleInput() {
-      var task = Console.In.ReadLineAsync();
-      TaskTags[task.Id] = "console";
-      Console.WriteLine($"task: id= {task.Id}, tag= {TaskTags[task.Id]}");
-      return task;
+      return Console.In.ReadLineAsync();
     }
 
     Task<CookieMessage[]> GetFibsInput() {
-      var task = fibs.ReadMessagesAsync();
-      TaskTags[task.Id] = "fibs";
-      Console.WriteLine($"task: id= {task.Id}, tag= {TaskTags[task.Id]}");
-      return task;
+      return fibs.ReadMessagesAsync();
+    }
+
+    void Prompt() {
+      Console.Write($"C:{consoleInputTask.Id} F:{fibsInputTask.Id}> ");
     }
 
     async Task RunAsync(string[] args) {
@@ -34,27 +32,26 @@ namespace Fibs {
       using (fibs = new FibsSession()) {
         await fibs.Login(user, pw);
 
-        Console.Write("> ");
-        var consoleInputTask = GetConsoleInput();
-        var fibsInputTask = GetFibsInput();
+        consoleInputTask = GetConsoleInput();
+        fibsInputTask = GetFibsInput();
+        Prompt();
 
         while(true) {
-          var task = Task.WhenAny(consoleInputTask, fibsInputTask);
+          var task = await Task.WhenAny(consoleInputTask, fibsInputTask);
           if( task.Id == consoleInputTask.Id) {
             var line = await consoleInputTask;
             await fibs.WriteLineAsync(line);
-            Console.Write("> ");
             consoleInputTask = GetConsoleInput();
+            Prompt();
           }
           else if( task.Id == fibsInputTask.Id) {
-            var cookieMessages = await fibsInputTask;
-            // TODO: handle cookie messages
-            Console.WriteLine($"cookieMessages.Length= {cookieMessages.Length}");
+            var messages = await fibsInputTask;
+            // TODO: handle messages
+            Console.WriteLine($"messages.Length= {messages.Length}");
             fibsInputTask = GetFibsInput();
+            Prompt();
           }
           else {
-            // TODO: why do I always end up here?!
-            Console.WriteLine($"unknown task id= {task.Id}");
             Debug.Assert(false);
           }
         }
