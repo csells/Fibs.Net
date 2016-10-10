@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -21,9 +20,6 @@ namespace Fibs {
 
     public bool IsConnected { get { return telnet.Connected; } }
 
-    //public async Task<IEnumerable<CookieMessage>> ReadMessagesAsync(int timeout = 5000) =>
-    //  Process(await ReadAsync(timeout));
-
     public async Task Login(string user, string pw) {
       await ExpectAsync(FibsCookie.FIBS_LoginPrompt);
       await WriteLineAsync($"login dotnetcli {FibsVersion} {user} {pw}");
@@ -33,7 +29,7 @@ namespace Fibs {
     // Use ToArray instead of yield return to make sure all messages in this string
     // are processed. yield return will stop in the middle if all of the messages
     // aren't pulled.
-    IEnumerable<CookieMessage> Process(string s) =>
+    CookieMessage[] Process(string s) =>
       s.Split(new string[] { "\r\n" }, StringSplitOptions.None).Select(l => monster.EatCookie(l)).ToArray();
 
     public async Task WriteLineAsync(string line) {
@@ -46,7 +42,10 @@ namespace Fibs {
       await telnet.GetStream().WriteAsync(writeBuffer, 0, writeBuffer.Length);
     }
 
-    public async Task<string> ReadAsync(int timeout = 5000) {
+    public async Task<CookieMessage[]> ReadMessagesAsync(int timeout = 5000) =>
+      Process(await ReadAsync(timeout));
+
+    async Task<string> ReadAsync(int timeout = 5000) {
       if (!telnet.Connected) { throw new Exception("not connected"); }
 
       var start = DateTime.Now;

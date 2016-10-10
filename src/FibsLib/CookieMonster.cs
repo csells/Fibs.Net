@@ -153,19 +153,19 @@ namespace Fibs {
 #if DEBUG
       // output the initial state if no state has been shown at all
       if (OldMessageState == null) {
-        Console.WriteLine($"State= {eatState}");
+        Debug.WriteLine($"State= {eatState}");
         OldMessageState = eatState;
       }
 
-      Console.WriteLine($"{cm.Cookie}: '{cm.Raw}'");
+      Debug.WriteLine($"{cm.Cookie}: '{cm.Raw}'");
       if (cm.Crumbs != null) {
         var crumbs = string.Join(", ", cm.Crumbs.Select(kvp => $"{kvp.Key}= {kvp.Value}"));
-        Console.WriteLine($"\t{crumbs}");
+        Debug.WriteLine($"\t{crumbs}");
       }
 
       // output the new state as soon as we transition
       if (OldMessageState != MessageState) {
-        Console.WriteLine($"State= {MessageState}");
+        Debug.WriteLine($"State= {MessageState}");
         OldMessageState = MessageState;
       }
 #endif
