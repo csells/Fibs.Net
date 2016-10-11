@@ -55,10 +55,9 @@ namespace Fibs {
       // keep trying for up to timeout milliseconds, as ReadAsync returns
       // when there is some input before the timeout, so what you're expecting
       // might not be here yet
-      var start = DateTime.Now;
-      var end = start.AddMilliseconds(timeout);
-      while (DateTime.Now < end) {
-        var s = await ReadAsync(new CancellationTokenSource(end - DateTime.Now).Token);
+      var cancel = new CancellationTokenSource(timeout).Token;
+      while (!cancel.IsCancellationRequested) {
+        var s = await ReadAsync(cancel);
         if (Process(s).Any(cm => cm.Cookie == cookie)) { return; }
       }
       throw new Exception($"{cookie} not found");

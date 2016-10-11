@@ -39,7 +39,7 @@ namespace Fibs {
 
         while (true) {
           var task = await Task.WhenAny(consoleInputTask, fibsInputTask);
-          if (task.Id == consoleInputTask.Id) {
+          if (task.Equals(consoleInputTask)) {
             var line = await consoleInputTask;
             if (!string.IsNullOrWhiteSpace(line)) {
               await fibs.WriteLineAsync(line);
@@ -47,7 +47,7 @@ namespace Fibs {
             consoleInputTask = GetConsoleInput();
             Prompt();
           }
-          else if (task.Id == fibsInputTask.Id) {
+          else if (task.Equals(fibsInputTask)) {
             var messages = await fibsInputTask;
             // TODO: handle messages
             Console.WriteLine($"messages.Length= {messages.Length}");
