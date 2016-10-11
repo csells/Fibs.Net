@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Fibs {
   class Program {
@@ -49,8 +53,11 @@ namespace Fibs {
           }
           else if (task.Equals(fibsInputTask)) {
             var messages = await fibsInputTask;
-            // TODO: handle messages
             Console.WriteLine($"messages.Length= {messages.Length}");
+            // TODO: handle this -- probably getting input in the middle of a line...
+            //Debug.Assert(!messages.Any(m => m.Cookie == FibsCookie.FIBS_Unknown));
+            var json = ToJson(messages);
+            Console.WriteLine("json= " + json);
             fibsInputTask = GetFibsInput();
             Prompt();
           }
@@ -61,5 +68,53 @@ namespace Fibs {
       }
     }
 
+    class CookieMessageJsonConverter : JsonConverter {
+      public override bool CanConvert(Type objectType) {
+        return objectType == typeof(CookieMessage);
+      }
+
+      public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) {
+        throw new NotImplementedException();
+      }
+
+      /* e.g.
+      [
+        {
+          "message": "CLIP_WELCOME",
+          "args": {
+            "name": "myself",
+            "lastLogin": "1041253132",
+            "lastHost": "192.168.1.308"
+          }
+        },
+        {
+          "message": "CLIP_MOTD_BEGIN"
+        },
+        {
+          "message": "FIBS_Unknown",
+          "raw": "adslkfjasdflkjasdflkjasdflkjadsf"
+        }
+      ]
+      */
+      public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) {
+        JToken t = JToken.FromObject(value);
+        if (t.Type != JTokenType.Object) {
+          t.WriteTo(writer);
+        }
+        else {
+          var cm = (CookieMessage)value;
+          JObject o = (JObject)t;
+          var crumbs = o.GetValue("Crumbs");
+          o.RemoveAll();
+          o.Add("message", cm.Cookie.ToString());
+          if (cm.Crumbs != null) { o.Add("args", crumbs); }
+          if (cm.Cookie == FibsCookie.FIBS_Unknown) { o.Add("raw", cm.Raw); }
+          o.WriteTo(writer);
+        }
+      }
+    }
+
+    string ToJson(IEnumerable<CookieMessage> messages) =>
+      JsonConvert.SerializeObject(messages, Formatting.Indented, new CookieMessageJsonConverter());
   }
 }
