@@ -1,4 +1,5 @@
 ﻿// From http://www.fibs.com/fcm/
+// FIBS Client Protocol Detailed Specification: http://www.fibs.com/fibs_interface.html
 /*
  *---  FIBSCookieMonster.c --------------------------------------------------
  *
@@ -717,5 +718,4 @@ namespace Fibs {
     FIBS_WrapFalse,
   }
   #endregion
-
 }

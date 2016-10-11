@@ -13,7 +13,8 @@ namespace Fibs {
     Task<CookieMessage[]> fibsInputTask;
 
     Task<string> GetConsoleInput() {
-      return Console.In.ReadLineAsync();
+      // from https://smellegantcode.wordpress.com/2012/08/28/a-boring-discovery/
+      return Task.Run(() => Console.In.ReadLine());
     }
 
     Task<CookieMessage[]> GetFibsInput() {
@@ -36,15 +37,17 @@ namespace Fibs {
         fibsInputTask = GetFibsInput();
         Prompt();
 
-        while(true) {
+        while (true) {
           var task = await Task.WhenAny(consoleInputTask, fibsInputTask);
-          if( task.Id == consoleInputTask.Id) {
+          if (task.Id == consoleInputTask.Id) {
             var line = await consoleInputTask;
-            await fibs.WriteLineAsync(line);
+            if (!string.IsNullOrWhiteSpace(line)) {
+              await fibs.WriteLineAsync(line);
+            }
             consoleInputTask = GetConsoleInput();
             Prompt();
           }
-          else if( task.Id == fibsInputTask.Id) {
+          else if (task.Id == fibsInputTask.Id) {
             var messages = await fibsInputTask;
             // TODO: handle messages
             Console.WriteLine($"messages.Length= {messages.Length}");
