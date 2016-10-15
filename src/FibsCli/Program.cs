@@ -32,10 +32,10 @@ namespace Fibs {
     void DumpMessages(CookieMessage[] messages) {
       var skip = new FibsCookie[] { FibsCookie.FIBS_Empty, FibsCookie.CLIP_MOTD_BEGIN, FibsCookie.CLIP_MOTD_END, FibsCookie.CLIP_WHO_END, };
       messages = messages.Where(cm => !skip.Contains(cm.Cookie)).ToArray();
-      Console.WriteLine($"messages.Length= {messages.Length}");
       if (messages.Length != 0) {
+        Debug.WriteLine($"messages.Length= {messages.Length}");
         var json = ToJson(messages);
-        Console.WriteLine("json= " + json);
+        Debug.WriteLine("json= " + json);
         Debug.Assert(!messages.Any(m => m.Cookie == FibsCookie.FIBS_Unknown), "FIBS_Unknown");
 
         var nocrumbs = new FibsCookie[] { FibsCookie.FIBS_LoginPrompt };
@@ -73,7 +73,6 @@ namespace Fibs {
             DumpMessages(messages);
             if (messages.Any(cm => cm.Cookie == FibsCookie.FIBS_Goodbye)) { break; }
             fibsInputTask = GetFibsInput();
-            Prompt();
           }
           else {
             Debug.Assert(false);

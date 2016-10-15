@@ -345,5 +345,14 @@ namespace FibsTest {
       Assert.Equal(2, int.Parse(cm.Crumbs["points"]));
     }
 
+    [Fact]
+    public void FIBS_NoOne() {
+      var monster = CreateLoggedInCookieMonster();
+      var s = "** There is no one called playerOne.";
+      var cm = monster.EatCookie(s);
+      Assert.Equal(FibsCookie.FIBS_NoOne, cm.Cookie);
+      Assert.Equal("playerOne", cm.Crumbs["name"]);
+    }
+
   }
 }

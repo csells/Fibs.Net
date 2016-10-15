@@ -405,7 +405,7 @@ namespace Fibs {
       new CookieDough { Cookie = FibsCookie.FIBS_PlayerLeftGame, Regex = new Regex("has left the game\\."), },   // overloaded
       new CookieDough { Cookie = FibsCookie.FIBS_YouInvited, Regex = new Regex("^\\*\\* You invited"), },
       new CookieDough { Cookie = FibsCookie.FIBS_YourLastLogin, Regex = new Regex("^\\*\\* Last login:"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_NoOne, Regex = new Regex("^\\*\\* There is no one called"), },
+      new CookieDough { Cookie = FibsCookie.FIBS_NoOne, Regex = new Regex("^\\*\\* There is no one called (?<name>[a-zA-Z_<>]+)"), },
       new CookieDough { Cookie = FibsCookie.FIBS_AllowpipFalse, Regex = new Regex("^\\*\\* You don't allow the use of the server's 'pip' command\\."), },
       new CookieDough { Cookie = FibsCookie.FIBS_AllowpipTrue, Regex = new Regex("^\\*\\* You allow the use the server's 'pip' command\\."), },
       new CookieDough { Cookie = FibsCookie.FIBS_AutoboardFalse, Regex = new Regex("^\\*\\* The board won't be refreshed"), },
