@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -29,20 +30,27 @@ namespace Fibs {
       Console.Write($"C:{consoleInputTask.Id} F:{fibsInputTask.Id}> ");
     }
 
+    StreamWriter dump = new StreamWriter(File.Open(@"c:\temp\fibs-dump.txt", FileMode.Create, FileAccess.Write, FileShare.Read));
+
     void DumpMessages(CookieMessage[] messages) {
       var skip = new FibsCookie[] { FibsCookie.FIBS_Empty, FibsCookie.CLIP_MOTD_BEGIN, FibsCookie.CLIP_MOTD_END, FibsCookie.CLIP_WHO_END, };
       messages = messages.Where(cm => !skip.Contains(cm.Cookie)).ToArray();
       if (messages.Length != 0) {
-        Debug.WriteLine($"messages.Length= {messages.Length}");
         var json = ToJson(messages);
-        Debug.WriteLine("json= " + json);
-        Debug.Assert(!messages.Any(m => m.Cookie == FibsCookie.FIBS_Unknown), "FIBS_Unknown");
+        dump.WriteLine($"json[{messages.Length}]= {json}");
 
         var nocrumbs = new FibsCookie[] { FibsCookie.FIBS_LoginPrompt };
-        foreach (var message in messages.Where(cm => !nocrumbs.Contains(cm.Cookie))) {
-          Debug.Assert(message.Crumbs != null, $"{message.Cookie}, no crumbs");
+        foreach (var message in messages) {
+          if (message.Cookie == FibsCookie.FIBS_Unknown) {
+            Debug.Assert(false, $"FIBS_Unknown: '{message.Raw}'");
+          }
+
+          if (message.Crumbs == null && !nocrumbs.Contains(message.Cookie)) {
+            Debug.Assert(false, $"{message.Cookie}, no crumbs");
+          }
         }
       }
+      dump.Flush();
     }
 
     async Task RunAsync(string[] args) {
@@ -117,7 +125,7 @@ namespace Fibs {
           o.Add("cookie", cm.Cookie.ToString());
           if (cm.Crumbs != null) { o.Add("crumbs", crumbs); }
           //if (cm.Cookie == FibsCookie.FIBS_Unknown) { o.Add("raw", cm.Raw); }
-          o.Add("raw", cm.Raw);
+          //o.Add("raw", cm.Raw);
           o.WriteTo(writer);
         }
       }
