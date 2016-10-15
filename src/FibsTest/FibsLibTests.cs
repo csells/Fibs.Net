@@ -12,7 +12,7 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void ClipWarning() {
+    public void FIBS_WARNINGAlreadyLoggedIn() {
       var monster = new CookieMonster();
       var s = "** Warning: You are already logged in.";
       var cm = monster.EatCookie(s);
@@ -20,7 +20,7 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void ClipUnknownCommandTest() {
+    public void FIBS_UnknownCommand() {
       var monster = CreateLoggedInCookieMonster();
       var s = "** Unknown command: 'fizzbuzz'";
       var cm = monster.EatCookie(s);
@@ -29,7 +29,7 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void ClipWelcomeTest() {
+    public void CLIP_WELCOME() {
       var monster = new CookieMonster();
       var s = "1 myself 1041253132 192.168.1.308";
       var cm = monster.EatCookie(s);
@@ -42,7 +42,7 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void ClipOwnInfoTest() {
+    public void CLIP_OWN_INFO() {
       var monster = new CookieMonster();
       var s = "2 myself 1 1 0 0 0 0 1 1 2396 0 1 0 1 3457.85 0 0 0 0 0 Australia/Melbourne";
       var cm = monster.EatCookie(s);
@@ -72,7 +72,7 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void ClipMotdBeginTest() {
+    public void CLIP_MOTD_BEGIN() {
       var monster = new CookieMonster();
       var s = "3";
       var cm = monster.EatCookie(s);
@@ -80,7 +80,7 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void ClipMotdLine1Test() {
+    public void FIBS_MOTD1() {
       var monster = new CookieMonster();
       monster.EatCookie("3");
       var s = "+--------------------------------------------------------------------+";
@@ -90,7 +90,7 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void ClipMotdLine2Test() {
+    public void FIBS_MOTD2() {
       var monster = new CookieMonster();
       monster.EatCookie("3");
       var s = "| It was a dark and stormy night in Oakland.  Outside, the rain      |";
@@ -100,7 +100,7 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void ClipMotdEndTest() {
+    public void CLIP_MOTD_END() {
       var monster = new CookieMonster();
       monster.EatCookie("3");
       var s = "4";
@@ -109,7 +109,7 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void ClipWhoInfoTest() {
+    public void CLIP_WHO_INFO() {
       var monster = CreateLoggedInCookieMonster();
       var s = "5 someplayer mgnu_advanced - 0 0 1418.61 23 1914 1041253132 192.168.40.3 MacFIBS someplayer@somewhere.com";
       var cm = monster.EatCookie(s);
@@ -130,7 +130,7 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void ClipWhoInfoEndTest() {
+    public void CLIP_WHO_END() {
       var monster = CreateLoggedInCookieMonster();
       var s = "6";
       var cm = monster.EatCookie(s);
@@ -138,7 +138,7 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void ClipLoginTest() {
+    public void CLIP_LOGIN() {
       var monster = CreateLoggedInCookieMonster();
       var s = "7 someplayer someplayer logs in.";
       var cm = monster.EatCookie(s);
@@ -148,7 +148,7 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void ClipLogoutTest() {
+    public void CLIP_LOGOUT() {
       var monster = CreateLoggedInCookieMonster();
       var s = "8 someplayer someplayer drops connection.";
       var cm = monster.EatCookie(s);
@@ -158,7 +158,7 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void ClipMessageTest() {
+    public void CLIP_MESSAGE() {
       var monster = CreateLoggedInCookieMonster();
       var s = "9 someplayer 1041253132 I'll log in at 10pm if you want to finish that game.";
       var cm = monster.EatCookie(s);
@@ -169,7 +169,7 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void ClipMessageDeliveredTest() {
+    public void CLIP_MESSAGE_DELIVERED() {
       var monster = CreateLoggedInCookieMonster();
       var s = "10 someplayer";
       var cm = monster.EatCookie(s);
@@ -178,7 +178,7 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void ClipMessageSavedTest() {
+    public void CLIP_MESSAGE_SAVED() {
       var monster = CreateLoggedInCookieMonster();
       var s = "11 someplayer";
       var cm = monster.EatCookie(s);
@@ -187,7 +187,7 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void ClipSaysTest() {
+    public void CLIP_SAYS() {
       var monster = CreateLoggedInCookieMonster();
       var s = "12 someplayer Do you want to play a game?";
       var cm = monster.EatCookie(s);
@@ -197,7 +197,7 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void ClipShoutsTest() {
+    public void CLIP_SHOUTS() {
       var monster = CreateLoggedInCookieMonster();
       var s = "13 someplayer Anybody for a 5 point match?";
       var cm = monster.EatCookie(s);
@@ -207,7 +207,7 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void ClipWhispersTest() {
+    public void CLIP_WHISPERS() {
       var monster = CreateLoggedInCookieMonster();
       var s = "14 someplayer I think he is using loaded dice :-)";
       var cm = monster.EatCookie(s);
@@ -217,7 +217,7 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void ClipKibitzesTest() {
+    public void CLIP_KIBITZES() {
       var monster = CreateLoggedInCookieMonster();
       var s = "15 someplayer G'Day and good luck from Hobart, Australia.";
       var cm = monster.EatCookie(s);
@@ -227,7 +227,7 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void ClipYouSayTest() {
+    public void CLIP_YOU_SAY() {
       var monster = CreateLoggedInCookieMonster();
       var s = "16 someplayer What's this \"G'Day\" stuff you hick? :-)";
       var cm = monster.EatCookie(s);
@@ -237,7 +237,7 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void ClipYouShoutTest() {
+    public void CLIP_YOU_SHOUT() {
       var monster = CreateLoggedInCookieMonster();
       var s = "17 Watch out for someplayer.  He's a Tasmanian.";
       var cm = monster.EatCookie(s);
@@ -246,7 +246,7 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void ClipYouWhisperTest() {
+    public void CLIP_YOU_WHISPER() {
       var monster = CreateLoggedInCookieMonster();
       var s = "18 Hello and hope you enjoy watching this game.";
       var cm = monster.EatCookie(s);
@@ -255,7 +255,7 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void ClipYouKibitzTest() {
+    public void CLIP_YOU_KIBITZ() {
       var monster = CreateLoggedInCookieMonster();
       var s = "19 Are you sure those dice aren't loaded?";
       var cm = monster.EatCookie(s);
@@ -264,12 +264,85 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void ClipUnknownTest() {
+    public void IBS_Unknown() {
       var monster = CreateLoggedInCookieMonster();
       var s = "something sump something";
       var cm = monster.EatCookie(s);
       Assert.Equal(FibsCookie.FIBS_Unknown, cm.Cookie);
       Assert.Equal("something sump something", cm.Raw);
+    }
+
+    [Fact]
+    public void FIBS_PlayerLeftGame() {
+      var monster = CreateLoggedInCookieMonster();
+      var s = "bob has left the game with alice.";
+      var cm = monster.EatCookie(s);
+      Assert.Equal(FibsCookie.FIBS_PlayerLeftGame, cm.Cookie);
+      Assert.Equal("bob", cm.Crumbs["leavingPlayer"]);
+      Assert.Equal("alice", cm.Crumbs["leftPlayer"]);
+    }
+
+    [Fact]
+    public void FIBS_PreLogin() {
+      var monster = new CookieMonster();
+      var s = "Saturday, October 15 17:01:02 MEST   ( Sat Oct 15 15:01:02 2016 UTC )";
+      var cm = monster.EatCookie(s);
+      Assert.Equal(FibsCookie.FIBS_PreLogin, cm.Cookie);
+      Assert.Equal(s, cm.Crumbs["message"]);
+    }
+
+    [Fact]
+    public void FIBS_Goodbye() {
+      var monster = CreateLoggedInCookieMonster();
+      var s = "           Goodbye.";
+      var cm = monster.EatCookie(s);
+      Assert.Equal(FibsCookie.FIBS_Goodbye, cm.Cookie);
+      Assert.Equal(s, cm.Crumbs["message"]);
+    }
+
+    [Fact]
+    public void FIBS_PostGoodbye() {
+      var monster = CreateLoggedInCookieMonster();
+      monster.EatCookie("           Goodbye.");
+      var s = "If you enjoyed using this server please send picture postcards,";
+      var cm = monster.EatCookie(s);
+      Assert.Equal(FibsCookie.FIBS_PostGoodbye, cm.Cookie);
+      Assert.Equal(s, cm.Crumbs["message"]);
+    }
+
+    [Fact]
+    public void FIBS_MatchResult() {
+      var monster = CreateLoggedInCookieMonster();
+      var s = "BlunderBot wins a 1 point match against LunaRossa  1-0 .";
+      var cm = monster.EatCookie(s);
+      Assert.Equal(FibsCookie.FIBS_MatchResult, cm.Cookie);
+      Assert.Equal("BlunderBot", cm.Crumbs["winner"]);
+      Assert.Equal("LunaRossa", cm.Crumbs["loser"]);
+      Assert.Equal(1, int.Parse(cm.Crumbs["points"]));
+      Assert.Equal(1, int.Parse(cm.Crumbs["winnerScore"]));
+      Assert.Equal(0, int.Parse(cm.Crumbs["loserScore"]));
+    }
+
+    [Fact]
+    public void FIBS_PlayersStartingMatch() {
+      var monster = CreateLoggedInCookieMonster();
+      var s = "BlunderBot_IV and eggieegg start a 1 point match.";
+      var cm = monster.EatCookie(s);
+      Assert.Equal(FibsCookie.FIBS_PlayersStartingMatch, cm.Cookie);
+      Assert.Equal("BlunderBot_IV", cm.Crumbs["player1"]);
+      Assert.Equal("eggieegg", cm.Crumbs["player2"]);
+      Assert.Equal(1, int.Parse(cm.Crumbs["points"]));
+    }
+
+    [Fact]
+    public void FIBS_ResumingLimitedMatch() {
+      var monster = CreateLoggedInCookieMonster();
+      var s = "inim and utah are resuming their 2-point match.";
+      var cm = monster.EatCookie(s);
+      Assert.Equal(FibsCookie.FIBS_ResumingLimitedMatch, cm.Cookie);
+      Assert.Equal("inim", cm.Crumbs["player1"]);
+      Assert.Equal("utah", cm.Crumbs["player2"]);
+      Assert.Equal(2, int.Parse(cm.Crumbs["points"]));
     }
 
   }

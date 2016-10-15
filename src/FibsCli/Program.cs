@@ -29,13 +29,30 @@ namespace Fibs {
       Console.Write($"C:{consoleInputTask.Id} F:{fibsInputTask.Id}> ");
     }
 
+    void DumpMessages(CookieMessage[] messages) {
+      var skip = new FibsCookie[] { FibsCookie.FIBS_Empty, FibsCookie.CLIP_MOTD_BEGIN, FibsCookie.CLIP_MOTD_END, FibsCookie.CLIP_WHO_END, };
+      messages = messages.Where(cm => !skip.Contains(cm.Cookie)).ToArray();
+      Console.WriteLine($"messages.Length= {messages.Length}");
+      if (messages.Length != 0) {
+        var json = ToJson(messages);
+        Console.WriteLine("json= " + json);
+        Debug.Assert(!messages.Any(m => m.Cookie == FibsCookie.FIBS_Unknown), "FIBS_Unknown");
+
+        var nocrumbs = new FibsCookie[] { FibsCookie.FIBS_LoginPrompt };
+        foreach (var message in messages.Where(cm => !nocrumbs.Contains(cm.Cookie))) {
+          Debug.Assert(message.Crumbs != null, $"{message.Cookie}, no crumbs");
+        }
+      }
+    }
+
     async Task RunAsync(string[] args) {
       // FIBS test user
       string user = "dotnetcli";
       string pw = "dotnetcli1";
 
       using (fibs = new FibsSession()) {
-        await fibs.Login(user, pw);
+        var messages = await fibs.Login(user, pw);
+        DumpMessages(messages);
 
         consoleInputTask = GetConsoleInput();
         fibsInputTask = GetFibsInput();
@@ -52,12 +69,9 @@ namespace Fibs {
             Prompt();
           }
           else if (task.Equals(fibsInputTask)) {
-            var messages = await fibsInputTask;
-            Console.WriteLine($"messages.Length= {messages.Length}");
-            // TODO: handle this -- probably getting input in the middle of a line...
-            //Debug.Assert(!messages.Any(m => m.Cookie == FibsCookie.FIBS_Unknown));
-            var json = ToJson(messages);
-            Console.WriteLine("json= " + json);
+            messages = await fibsInputTask;
+            DumpMessages(messages);
+            if (messages.Any(cm => cm.Cookie == FibsCookie.FIBS_Goodbye)) { break; }
             fibsInputTask = GetFibsInput();
             Prompt();
           }
@@ -78,20 +92,15 @@ namespace Fibs {
       }
 
       /* e.g.
-      [
-        {
-          "message": "CLIP_WELCOME",
+      [ { "message": "CLIP_WELCOME",
           "args": {
             "name": "myself",
             "lastLogin": "1041253132",
             "lastHost": "192.168.1.308"
           }
         },
-        {
-          "message": "CLIP_MOTD_BEGIN"
-        },
-        {
-          "message": "FIBS_Unknown",
+        { "message": "CLIP_MOTD_BEGIN" },
+        { "message": "FIBS_Unknown",
           "raw": "adslkfjasdflkjasdflkjasdflkjadsf"
         }
       ]
@@ -106,9 +115,10 @@ namespace Fibs {
           JObject o = (JObject)t;
           var crumbs = o.GetValue("Crumbs");
           o.RemoveAll();
-          o.Add("message", cm.Cookie.ToString());
-          if (cm.Crumbs != null) { o.Add("args", crumbs); }
-          if (cm.Cookie == FibsCookie.FIBS_Unknown) { o.Add("raw", cm.Raw); }
+          o.Add("cookie", cm.Cookie.ToString());
+          if (cm.Crumbs != null) { o.Add("crumbs", crumbs); }
+          //if (cm.Cookie == FibsCookie.FIBS_Unknown) { o.Add("raw", cm.Raw); }
+          o.Add("raw", cm.Raw);
           o.WriteTo(writer);
         }
       }
