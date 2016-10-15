@@ -278,8 +278,8 @@ namespace FibsTest {
       var s = "bob has left the game with alice.";
       var cm = monster.EatCookie(s);
       Assert.Equal(FibsCookie.FIBS_PlayerLeftGame, cm.Cookie);
-      Assert.Equal("bob", cm.Crumbs["leavingPlayer"]);
-      Assert.Equal("alice", cm.Crumbs["leftPlayer"]);
+      Assert.Equal("bob", cm.Crumbs["player1"]);
+      Assert.Equal("alice", cm.Crumbs["player2"]);
     }
 
     [Fact]
