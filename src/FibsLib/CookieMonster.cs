@@ -157,7 +157,7 @@ namespace Fibs {
 
       if (cm == null) { cm = new CookieMessage(FibsCookie.FIBS_Unknown, raw, null, eatState); }
 
-#if DEBUG
+#if FALSE
       // output the initial state if no state has been shown at all
       if (OldMessageState == null) {
         Debug.WriteLine($"State= {eatState}");

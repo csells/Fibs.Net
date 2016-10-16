@@ -2,41 +2,55 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title></title>
+  <title>Welcome to FibsFun!</title>
 </head>
 <body>
-  <div id="output"></div>
-  <script>
-    var socket;
-    var uri = "ws://" + window.location.host + "/ws";
-    var output;
-    var text = "login dotnetcli dotnetcli1";
+  <div><span>socket:</span><span id="socketStatus">pending</span></div>
+  <form id="loginForm">
+    <div><span>user: <input id="user" /></span></div>
+    <div><span>password: <input id="password" type="password" /></span></div>
+    <div><input id="login" type="submit" /></div>
+  </form>
+  <form id="cmdForm">
+    <div><span>FIBS&gt;</span><input id="cmd" /></div>
+    <div id="dump" style="height: 100pt;"></div>
+  </form>
 
-    function write(s) {
+  <script>
+    window.onload = function () {
+      var socket = new WebSocket("ws://" + window.location.host + "/fibs");
+
+      socket.onopen = function (e) { $("#socketStatus").innerText = "open"; };
+      socket.onclose = function (e) { $("#socketStatus").innerText = "closed"; };
+      socket.onmessage = function (e) { dump(e.data); };
+      socket.onerror = function (e) { dump("Error: " + e.data); };
+
+      $("#loginForm").onsubmit = function (e) {
+        var user = $("#user").value;
+        var password = $("#password").value;
+        dump("logging in as " + user);
+        socket.send("login " + user + " " + password);
+        e.preventDefault();
+        e.cancelBubble = true;
+      };
+
+      $("#cmdForm").onsubmit = function (e) {
+        var cmd = $("#cmd").value;
+        if (cmd != "") { socket.send(cmd); $("#cmd").value = ""; }
+        e.preventDefault();
+        e.cancelBubble = true;
+      };
+
+    };
+
+    function dump(s) {
       var p = document.createElement("p");
       p.innerHTML = s;
-      output.appendChild(p);
+      $("#dump").appendChild(p);
     }
 
-    function doConnect() {
-      socket = new WebSocket(uri);
-      socket.onopen = function (e) { write("opened " + uri); doSend(); };
-      socket.onclose = function (e) { write("closed"); };
-      socket.onmessage = function (e) { write("Received: " + e.data); socket.close(); };
-      socket.onerror = function (e) { write("Error: " + e.data); };
-    }
-
-    function doSend() {
-      write("Sending: " + text);
-      socket.send(text);
-    }
-
-    function onInit() {
-      output = document.getElementById("output");
-      doConnect();
-    }
-
-    window.onload = onInit;
+    function $(selector) { return document.querySelector(selector); }
+    function $$(selector) { return document.querySelectorAll(selector); }
   </script>
 </body>
 </html>

@@ -22,11 +22,12 @@ namespace Fibs {
 
     public bool IsConnected { get { return telnet.Connected; } }
 
-    public async Task<CookieMessage[]> Login(string user, string password) {
+    public async Task<CookieMessage[]> Login(string user, string password, CancellationToken cancel = default(CancellationToken)) {
+      if (cancel == default(CancellationToken)) { cancel = new CancellationTokenSource(5000).Token; }
       var messages = new List<CookieMessage>();
-      messages.AddRange(await ExpectMessageAsync(FibsCookie.FIBS_LoginPrompt));
+      messages.AddRange(await ExpectMessageAsync(FibsCookie.FIBS_LoginPrompt, cancel));
       await WriteLineAsync($"login dotnetcli {FibsVersion} {user} {password}");
-      messages.AddRange(await ExpectMessageAsync(FibsCookie.CLIP_MOTD_END));
+      messages.AddRange(await ExpectMessageAsync(FibsCookie.CLIP_MOTD_END, cancel));
       return messages.ToArray();
     }
 
@@ -70,13 +71,8 @@ namespace Fibs {
       return Encoding.ASCII.GetString(readBuffer, 0, count);
     }
 
-    async Task<CookieMessage[]> ExpectMessageAsync(FibsCookie cookie, int timeout = 5000) {
+    async Task<CookieMessage[]> ExpectMessageAsync(FibsCookie cookie, CancellationToken cancel) {
       var allMessages = new List<CookieMessage>();
-
-      // keep trying for up to timeout milliseconds, as ReadAsync returns
-      // when there is some input before the timeout, so what you're expecting
-      // might not be here yet
-      var cancel = new CancellationTokenSource(timeout).Token;
       while (!cancel.IsCancellationRequested) {
         var s = await ReadAsync(cancel);
         var someMessages = Process(s);
