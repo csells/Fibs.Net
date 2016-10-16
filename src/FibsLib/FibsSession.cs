@@ -22,10 +22,10 @@ namespace Fibs {
 
     public bool IsConnected { get { return telnet.Connected; } }
 
-    public async Task<CookieMessage[]> Login(string user, string pw) {
+    public async Task<CookieMessage[]> Login(string user, string password) {
       var messages = new List<CookieMessage>();
       messages.AddRange(await ExpectMessageAsync(FibsCookie.FIBS_LoginPrompt));
-      await WriteLineAsync($"login dotnetcli {FibsVersion} {user} {pw}");
+      await WriteLineAsync($"login dotnetcli {FibsVersion} {user} {password}");
       messages.AddRange(await ExpectMessageAsync(FibsCookie.CLIP_MOTD_END));
       return messages.ToArray();
     }

@@ -5,12 +5,12 @@ namespace FibsProxy {
   public class Program {
     public static void Main(string[] args) {
       new WebHostBuilder()
-          .UseKestrel()
-          .UseContentRoot(Directory.GetCurrentDirectory())
-          .UseIISIntegration()
-          .UseStartup<Startup>()
-          .Build()
-          .Run();
+        .UseKestrel()
+        .UseContentRoot(Directory.GetCurrentDirectory())
+        .UseIISIntegration()
+        .UseStartup<Startup>()
+        .Build()
+        .Run();
     }
   }
 }

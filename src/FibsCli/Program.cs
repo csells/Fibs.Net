@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Fibs {
   class Program {
@@ -36,11 +33,14 @@ namespace Fibs {
       var skip = new FibsCookie[] { FibsCookie.FIBS_Empty, FibsCookie.CLIP_MOTD_BEGIN, FibsCookie.CLIP_MOTD_END, FibsCookie.CLIP_WHO_END, };
       messages = messages.Where(cm => !skip.Contains(cm.Cookie)).ToArray();
       if (messages.Length != 0) {
-        var json = ToJson(messages);
-        dump.WriteLine($"json[{messages.Length}]= {json}");
+        dump.WriteLine($"{messages.Length} messages:");
 
         var nocrumbs = new FibsCookie[] { FibsCookie.FIBS_LoginPrompt };
         foreach (var message in messages) {
+          dump.Write($"{message.Cookie}: ");
+          if (message.Crumbs != null) foreach (var crumb in message.Crumbs) dump.Write($"{crumb.Key}= '{crumb.Value}', ");
+          dump.WriteLine();
+
           if (message.Cookie == FibsCookie.FIBS_Unknown) {
             Debug.Assert(false, $"FIBS_Unknown: '{message.Raw}'");
           }
@@ -59,11 +59,8 @@ namespace Fibs {
       string pw = "dotnetcli1";
 
       using (fibs = new FibsSession()) {
-        var messages = await fibs.Login(user, pw);
-        DumpMessages(messages);
-
         consoleInputTask = GetConsoleInput();
-        fibsInputTask = GetFibsInput();
+        fibsInputTask = fibs.Login(user, pw);
         Prompt();
 
         while (true) {
@@ -77,7 +74,7 @@ namespace Fibs {
             Prompt();
           }
           else if (task.Equals(fibsInputTask)) {
-            messages = await fibsInputTask;
+            var messages = await fibsInputTask;
             DumpMessages(messages);
             if (messages.Any(cm => cm.Cookie == FibsCookie.FIBS_Goodbye)) { break; }
             fibsInputTask = GetFibsInput();
@@ -88,50 +85,5 @@ namespace Fibs {
         }
       }
     }
-
-    class CookieMessageJsonConverter : JsonConverter {
-      public override bool CanConvert(Type objectType) {
-        return objectType == typeof(CookieMessage);
-      }
-
-      public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) {
-        throw new NotImplementedException();
-      }
-
-      /* e.g.
-      [ { "message": "CLIP_WELCOME",
-          "args": {
-            "name": "myself",
-            "lastLogin": "1041253132",
-            "lastHost": "192.168.1.308"
-          }
-        },
-        { "message": "CLIP_MOTD_BEGIN" },
-        { "message": "FIBS_Unknown",
-          "raw": "adslkfjasdflkjasdflkjasdflkjadsf"
-        }
-      ]
-      */
-      public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) {
-        JToken t = JToken.FromObject(value);
-        if (t.Type != JTokenType.Object) {
-          t.WriteTo(writer);
-        }
-        else {
-          var cm = (CookieMessage)value;
-          JObject o = (JObject)t;
-          var crumbs = o.GetValue("Crumbs");
-          o.RemoveAll();
-          o.Add("cookie", cm.Cookie.ToString());
-          if (cm.Crumbs != null) { o.Add("crumbs", crumbs); }
-          //if (cm.Cookie == FibsCookie.FIBS_Unknown) { o.Add("raw", cm.Raw); }
-          //o.Add("raw", cm.Raw);
-          o.WriteTo(writer);
-        }
-      }
-    }
-
-    string ToJson(IEnumerable<CookieMessage> messages) =>
-      JsonConvert.SerializeObject(messages, Formatting.Indented, new CookieMessageJsonConverter());
   }
 }
