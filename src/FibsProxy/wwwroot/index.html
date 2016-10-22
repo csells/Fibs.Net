@@ -5,43 +5,59 @@
   <title>Welcome to FibsFun!</title>
 </head>
 <body>
-  <div><span>socket:</span><span id="socketStatus">pending</span></div>
   <form id="loginForm">
     <div><span>user: <input id="user" /></span></div>
     <div><span>password: <input id="password" type="password" /></span></div>
-    <div><input id="login" type="submit" /></div>
+    <div><input id="loginButton" type="submit" value="Login" /></div>
   </form>
-  <form id="cmdForm">
-    <div><span>FIBS&gt;</span><input id="cmd" /></div>
-    <div id="dump" style="height: 100pt;"></div>
+  <form id="logoutForm">
+    <div><span>status:</span><span id="socketStatus">closed</span></div>
+    <div><input id="logoutButton" type="submit" value="Logout" /></div>
   </form>
 
   <script>
+    var socket = null;
+
     window.onload = function () {
-      var socket = new WebSocket("ws://" + window.location.host + "/fibs");
-
-      socket.onopen = function (e) { $("#socketStatus").innerText = "open"; };
-      socket.onclose = function (e) { $("#socketStatus").innerText = "closed"; };
-      socket.onmessage = function (e) { dump(e.data); };
-      socket.onerror = function (e) { dump("Error: " + e.data); };
-
       $("#loginForm").onsubmit = function (e) {
         var user = $("#user").value;
         var password = $("#password").value;
-        dump("logging in as " + user);
-        socket.send("login " + user + " " + password);
+
+        socket = new WebSocket("ws://" + window.location.host + "/fibs");
+        socket.onopen = function (e) {
+          socket.send("login " + user + " " + password);
+          $("#socketStatus").innerText = "logging in as " + user;
+        };
+
+        socket.onclose = function (e) {
+          socket = null;
+          $("#socketStatus").innerText = "closed";
+        };
+
+        socket.onmessage = function (e) {
+          process(e.data);
+        };
+
+        socket.onerror = function (e) {
+          dump("Error: " + e.data);
+        };
+
         e.preventDefault();
         e.cancelBubble = true;
       };
 
-      $("#cmdForm").onsubmit = function (e) {
-        var cmd = $("#cmd").value;
-        if (cmd != "") { socket.send(cmd); $("#cmd").value = ""; }
+      $("#logoutForm").onsubmit = function (e) {
+        socket.close();
         e.preventDefault();
         e.cancelBubble = true;
       };
 
     };
+
+    function process(json) {
+      var data = JSON.parse(json);
+
+    }
 
     function dump(s) {
       var p = document.createElement("p");

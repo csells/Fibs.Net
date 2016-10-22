@@ -1,0 +1,6 @@
+{
+  "name": "fibs-web",
+  "short_name": "fibs-web",
+  "start_url": "/",
+  "display": "standalone"
+}
