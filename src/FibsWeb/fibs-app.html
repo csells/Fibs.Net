@@ -1,26 +1,26 @@
 <link rel="import" href="bower_components/polymer/polymer.html" />
+<link rel="import" href="fibs-login.html" />
 <link rel="import" href="fibs-motd.html" />
 
 <dom-module id="fibs-app">
   <template>
-    <div>status: [[status]]</div>
-    <div><span>user: <input value="{{user::input}}" /></span></div>
-    <div><span>password: <input value="{{password::input}}" type="password" /></span></div>
-    <div><button on-tap="login">Login</button></div> <!-- TODO: set disabled propery based on user/password -->
-    <div><button on-tap="logout">Logout</button></div> <!-- TODO: set disabled propery based on login state -->
+    <fibs-login status="[[status]]"></fibs-login>
     <fibs-motd></fibs-motd>
   </template>
   <script>
     Polymer({
       is: "fibs-app",
+
       properties: {
-        user: String,
-        password: String,
         status: {
           type: String,
           notify: true,
-          value: "pending",
+          value: "closed",
         },
+      },
+
+      ready: function () {
+        console.log("fibs-app ready");
       },
 
       send: function (s) {
@@ -28,16 +28,16 @@
         this._socket.send(s);
       },
 
-      login: function () {
+      login: function (user, password) {
         if (this._socket) { throw "logout first"; }
 
         this._socket = new WebSocket("ws://localhost:62953/fibs");
         this.status = "opening";
 
         this._socket.onopen = e => {
-          console.log("socket: logging in as " + this.user);
+          console.log("socket: logging in as " + user);
           this.status = "logging in";
-          this._socket.send("login " + this.user + " " + this.password);
+          this._socket.send("login " + user + " " + password);
         };
 
         this._socket.onmessage = e => {
@@ -65,6 +65,7 @@
         this.status = "sending bye";
         if (this._socket) { this._socket.send("bye"); }
       },
+
     });
   </script>
 </dom-module>

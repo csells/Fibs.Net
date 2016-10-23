@@ -1,0 +1,47 @@
+﻿<link rel="import" href="bower_components/polymer/polymer.html" />
+
+<dom-module id="fibs-login">
+  <template>
+    <form on-submit="_toggleLogin">
+      <div>status: [[status]]</div>
+      <div><span>user: <input value="{{user::input}}" /></span></div>
+      <div><span>password: <input value="{{password::input}}" type="password" /></span></div>
+      <div><input type="submit" value="[[_buttonName(status)]]" disabled="[[_buttonDisabled(user, password, status)]]" /></div>
+    </form>
+  </template>
+
+  <script>
+    Polymer({
+      is: "fibs-login",
+
+      properties: {
+        user: String,
+        password: String,
+        status: String,
+      },
+
+      ready: function () {
+        this._app = document.querySelector("fibs-app");
+      },
+
+      _buttonName: function (status) {
+        return status == "closed" ? "Login" : "Logout";
+      },
+
+      _buttonDisabled: function (user, password, status) {
+        if (user == "" || password == "") { return true; }
+        if (status != "closed" && status != "logged in") { return true; }
+        return false;
+      },
+
+      _toggleLogin: function (e) {
+        e.preventDefault();
+        e.cancelBubble = true;
+        if (this.status == "closed") { this._app.login(this.user, this.password); }
+        else { this._app.logout(); }
+      },
+
+    });
+
+  </script>
+</dom-module>
