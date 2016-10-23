@@ -24,11 +24,13 @@
       },
 
       send: function (s) {
-        if (this._socket == undefined) { throw "login first"; }
+        if (!this._socket) { throw "login first"; }
         this._socket.send(s);
       },
 
       login: function () {
+        if (this._socket) { throw "logout first"; }
+
         this._socket = new WebSocket("ws://localhost:62953/fibs");
         this.status = "opening";
 
@@ -40,7 +42,7 @@
 
         this._socket.onmessage = e => {
           this.status = "logged in";
-          console.log("socket: message= " + e.data);
+          //console.log("socket: message= " + e.data);
           JSON.parse(e.data).forEach(message => {
             this.fire(message.cookie, message.crumbs);
           });

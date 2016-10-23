@@ -1,8 +1,8 @@
 ﻿<link rel="import" href="bower_components/polymer/polymer.html" />
 
 <dom-module id="fibs-motd">
-  <template>
-    <span>[[motd]]</span>
+  <template is="dom-repeat" items="{{motd}}" as="line">
+    <p>{{line}}</p>
   </template>
 
   <script>
@@ -11,22 +11,35 @@
 
       properties: {
         motd: {
-          type: String,
-          value: "",
-          notify: true,
+          type: Array,
+          value: function () { return []; }
         },
       },
 
       ready: function () {
+        this.motd = [];
         var fibs = document.querySelector("fibs-app");
-        fibs.addEventListener("CLIP_MOTD_BEGIN", e => this._onmessage(e));
-        fibs.addEventListener("FIBS_MOTD", e => this._onmessage(e));
+        this.listen(fibs, "CLIP_MOTD_BEGIN", "_onmessage");
+        this.listen(fibs, "FIBS_MOTD", "_onmessage");
+        this.listen(fibs, "CLIP_MOTD_END", "_onmessage");
       },
 
       _onmessage: function (e) {
         switch (e.type) {
-          case "CLIP_MOTD_BEGIN": this.motd = ""; break;
-          case "FIBS_MOTD": this.motd += e.detail.message; break;
+          case "CLIP_MOTD_BEGIN": this.splice("motd", 0, this.motd.length); break;
+          case "FIBS_MOTD":
+            var line = e.detail.message.trim();
+            if (line.startsWith("+")) { break; }
+            if (line.startsWith("|")) { line = line.substr(1); }
+            if (line.endsWith("|")) { line = line.substr(0, line.length - 1); }
+            line = line.trim();
+            if (line == "") { break; }
+            this.push("motd", line.trim());
+            break;
+          case "CLIP_MOTD_END":
+            this.set("motd", this.motd);
+            console.log("motd= " + this.motd);
+            break;
         }
       },
     });
