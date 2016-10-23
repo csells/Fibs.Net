@@ -25,7 +25,7 @@ namespace FibsProxy {
       app.Use(SocketHandler.Acceptor);
     }
 
-    static FibsCookie[] MessagesToSkip = new FibsCookie[] { FibsCookie.FIBS_Empty, FibsCookie.CLIP_MOTD_BEGIN, };
+    static FibsCookie[] MessagesToSkip = new FibsCookie[] { FibsCookie.FIBS_Empty };
 
     async Task FibsLoop(WebSocket socket) {
       using (var fibs = new FibsSession()) {
