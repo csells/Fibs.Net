@@ -9,7 +9,25 @@
     Polymer({
       is: "fibs-motd",
 
-      ready: {
+      properties: {
+        motd: {
+          type: String,
+          value: "",
+          notify: true,
+        },
+      },
+
+      ready: function () {
+        var fibs = document.querySelector("fibs-app");
+        fibs.addEventListener("CLIP_MOTD_BEGIN", e => this._onmessage(e));
+        fibs.addEventListener("FIBS_MOTD", e => this._onmessage(e));
+      },
+
+      _onmessage: function (e) {
+        switch (e.type) {
+          case "CLIP_MOTD_BEGIN": this.motd = ""; break;
+          case "FIBS_MOTD": this.motd += e.detail.message; break;
+        }
       },
     });
   </script>

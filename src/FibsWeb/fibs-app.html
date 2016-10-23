@@ -1,0 +1,67 @@
+<link rel="import" href="bower_components/polymer/polymer.html" />
+<link rel="import" href="fibs-motd.html" />
+
+<dom-module id="fibs-app">
+  <template>
+    <div>status: [[status]]</div>
+    <div><span>user: <input value="{{user::input}}" /></span></div>
+    <div><span>password: <input value="{{password::input}}" type="password" /></span></div>
+    <div><button on-tap="login">Login</button></div> <!-- TODO: set disabled propery based on user/password -->
+    <div><button on-tap="logout">Logout</button></div> <!-- TODO: set disabled propery based on login state -->
+    <fibs-motd></fibs-motd>
+  </template>
+  <script>
+    Polymer({
+      is: "fibs-app",
+      properties: {
+        user: String,
+        password: String,
+        status: {
+          type: String,
+          notify: true,
+          value: "pending",
+        },
+      },
+
+      send: function (s) {
+        if (this._socket == undefined) { throw "login first"; }
+        this._socket.send(s);
+      },
+
+      login: function () {
+        this._socket = new WebSocket("ws://localhost:62953/fibs");
+        this.status = "opening";
+
+        this._socket.onopen = e => {
+          console.log("socket: logging in as " + this.user);
+          this.status = "logging in";
+          this._socket.send("login " + this.user + " " + this.password);
+        };
+
+        this._socket.onmessage = e => {
+          this.status = "logged in";
+          console.log("socket: message= " + e.data);
+          JSON.parse(e.data).forEach(message => {
+            this.fire(message.cookie, message.crumbs);
+          });
+        };
+
+        this._socket.onclose = e => {
+          console.log("socket: closed");
+          this.status = "closed";
+          this._socket = undefined;
+        };
+
+        this._socket.onerror = e => {
+          console.log("socket: error= " + e.data);
+        };
+      },
+
+      logout: function () {
+        console.log("logout");
+        this.status = "sending bye";
+        if (this._socket) { this._socket.send("bye"); }
+      },
+    });
+  </script>
+</dom-module>
