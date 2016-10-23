@@ -52,6 +52,7 @@
           console.log("socket: closed");
           this.status = "closed";
           this._socket = undefined;
+          this.fire("FIBS_Closed");
         };
 
         this._socket.onerror = e => {

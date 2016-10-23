@@ -1,8 +1,10 @@
 ﻿<link rel="import" href="bower_components/polymer/polymer.html" />
 
 <dom-module id="fibs-motd">
-  <template is="dom-repeat" items="{{motd}}" as="line">
-    <p>{{line}}</p>
+  <template>
+    <template is="dom-repeat" items="[[lines]]" as="line">
+      <p>{{line}}</p>
+    </template>
   </template>
 
   <script>
@@ -10,38 +12,34 @@
       is: "fibs-motd",
 
       properties: {
-        motd: {
+        lines: {
           type: Array,
           value: function () { return []; }
         },
       },
 
       ready: function () {
-        this.motd = [];
         var fibs = document.querySelector("fibs-app");
-        this.listen(fibs, "CLIP_MOTD_BEGIN", "_onmessage");
-        this.listen(fibs, "FIBS_MOTD", "_onmessage");
-        this.listen(fibs, "CLIP_MOTD_END", "_onmessage");
+        this.listen(fibs, "CLIP_MOTD_BEGIN", "_onMotdReset");
+        this.listen(fibs, "FIBS_MOTD", "_onMotdLine");
+        this.listen(fibs, "FIBS_Closed", "_onMotdReset");
       },
 
-      _onmessage: function (e) {
-        switch (e.type) {
-          case "CLIP_MOTD_BEGIN": this.splice("motd", 0, this.motd.length); break;
-          case "FIBS_MOTD":
-            var line = e.detail.message.trim();
-            if (line.startsWith("+")) { break; }
-            if (line.startsWith("|")) { line = line.substr(1); }
-            if (line.endsWith("|")) { line = line.substr(0, line.length - 1); }
-            line = line.trim();
-            if (line == "") { break; }
-            this.push("motd", line.trim());
-            break;
-          case "CLIP_MOTD_END":
-            this.set("motd", this.motd);
-            console.log("motd= " + this.motd);
-            break;
-        }
+      _onMotdReset: function () {
+        this.set("lines", []);
       },
+
+      _onMotdLine: function(e) {
+        // strip all of the ASCII box stuff from around the MOTD
+        var line = e.detail.message.trim();
+        if (line.startsWith("+")) { return; }
+        if (line.startsWith("|")) { line = line.substr(1); }
+        if (line.endsWith("|")) { line = line.substr(0, line.length - 1); }
+        line = line.trim();
+        if (line == "") { return; }
+        this.push("lines", line);
+      },
+
     });
   </script>
 </dom-module>
