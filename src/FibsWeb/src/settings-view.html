@@ -2,11 +2,81 @@
 
 <dom-module id="settings-view">
   <template>
-    Hello and welcome to the settings view!
+    <div>Allow Pip: [[allowPip]]</div>
   </template>
   <script>
     Polymer({
       is: "settings-view",
+
+      properties: {
+        allowPip: Boolean,
+        autoBoard: Boolean,
+        autoDouble: Boolean,
+        autoMove: Boolean,
+        away: Boolean,
+        bell: Boolean,
+        crawford: Boolean,
+        double: Boolean,
+        experience: Number,
+        greedy: Boolean,
+        moreBoards: Boolean,
+        moves: Boolean,
+        notify: Boolean,
+        rating: Number,
+        ratings: Boolean,
+        ready: Boolean,
+        redoubles: String,
+        report: Boolean,
+        silent: Boolean,
+        timezone: String,
+      },
+
+      created: function() {
+        this._app = document.querySelector("fibs-app");
+        //this.listen(this._app, "CLIP_OWN_INFO", "_onOwnInfo");
+        this.listen(this._app, "FIBS_AllowpipTrue", "_onAllowPipTrue");
+        this.listen(this._app, "FIBS_AllowpipFalse", "_onAllowPipFalse");
+      },
+
+      ready: function () {
+        if (this.allowPip == undefined) {
+          this._app.send("toggle"); // get current settings
+        }
+      },
+
+      _onAllowPipTrue: function () {
+        this.allowPip = true;
+      },
+
+      _onAllowPipFalse: function () {
+        this.allowPip = false;
+      },
+
+      _onOwnInfo: function (e) {
+        var parseBool = s => s == "1";
+
+        this.allowPip = parseBool(e.detail.allowPip);
+        //autoBoard: Boolean,
+        //autoDouble: Boolean,
+        //autoMove: Boolean,
+        //away: Boolean,
+        //bell: Boolean,
+        //crawford: Boolean,
+        //double: Boolean,
+        //experience: Number,
+        //greedy: Boolean,
+        //moreBoards: Boolean,
+        //moves: Boolean,
+        //notify: Boolean,
+        //rating: Number,
+        //ratings: Boolean,
+        //ready: Boolean,
+        //redoubles: String,
+        //report: Boolean,
+        //silent: Boolean,
+        //timezone: String,
+      },
+
     });
   </script>
 </dom-module>

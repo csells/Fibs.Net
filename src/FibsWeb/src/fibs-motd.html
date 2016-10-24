@@ -23,14 +23,14 @@
         this.listen(this._app, "CLIP_MOTD_BEGIN", "_onMotdReset");
         this.listen(this._app, "FIBS_MOTD", "_onMotdLine");
         this.listen(this._app, "FIBS_Closed", "_onMotdReset");
-        this.listen(this._app, "socket-status-changed", "_socketStatusChanged");
+        this.listen(this._app, "socket-status-changed", "_onSocketStatusChanged");
       },
 
       _onMotdReset: function () {
         this.set("lines", []);
       },
 
-      _socketStatusChanged: function () {
+      _onSocketStatusChanged: function () {
         if (this._app.socketStatus == "closed") { this._onMotdReset(); }
       },
 

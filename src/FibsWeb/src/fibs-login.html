@@ -25,11 +25,11 @@
 
       ready: function () {
         this._app = document.querySelector("fibs-app");
-        this.listen(this._app, "socket-status-changed", "_socketStatusChanged");
+        this.listen(this._app, "socket-status-changed", "_onSocketStatusChanged");
         this.status = this._app.socketStatus;
       },
 
-      _socketStatusChanged: function () {
+      _onSocketStatusChanged: function () {
         this.status = this._app.socketStatus;
       },
 
