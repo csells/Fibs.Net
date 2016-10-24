@@ -1,0 +1,17 @@
+{
+  "entrypoint": "index.html",
+  "shell": "src/fibs-app.html",
+  "fragments": [
+    "src/login-view.html",
+    "src/settings-view.html"
+  ],
+  "sourceGlobs": [
+   "src/**/*",
+   "images/**/*",
+   "bower.json"
+  ],
+  "includeDependencies": [
+    "manifest.json",
+    "bower_components/webcomponentsjs/webcomponents-lite.min.js"
+  ]
+}

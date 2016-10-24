@@ -1,4 +1,4 @@
-﻿<link rel="import" href="bower_components/polymer/polymer.html" />
+﻿<link rel="import" href="../bower_components/polymer/polymer.html">
 
 <dom-module id="fibs-motd">
   <template>
@@ -19,17 +19,22 @@
       },
 
       ready: function () {
-        var fibs = document.querySelector("fibs-app");
-        this.listen(fibs, "CLIP_MOTD_BEGIN", "_onMotdReset");
-        this.listen(fibs, "FIBS_MOTD", "_onMotdLine");
-        this.listen(fibs, "FIBS_Closed", "_onMotdReset");
+        this._app = document.querySelector("fibs-app");
+        this.listen(this._app, "CLIP_MOTD_BEGIN", "_onMotdReset");
+        this.listen(this._app, "FIBS_MOTD", "_onMotdLine");
+        this.listen(this._app, "FIBS_Closed", "_onMotdReset");
+        this.listen(this._app, "socket-status-changed", "_socketStatusChanged");
       },
 
       _onMotdReset: function () {
         this.set("lines", []);
       },
 
-      _onMotdLine: function(e) {
+      _socketStatusChanged: function () {
+        if (this._app.socketStatus == "closed") { this._onMotdReset(); }
+      },
+
+      _onMotdLine: function (e) {
         // strip all of the ASCII box stuff from around the MOTD
         var line = e.detail.message.trim();
         if (line.startsWith("+")) { return; }
