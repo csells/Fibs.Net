@@ -1,0 +1,146 @@
+﻿<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<script>
+  Polymer({
+    is: "fibs-client",
+
+    hostAttributes: {
+      hidden: true
+    },
+
+    properties: {
+      status: {
+        type: String,
+        value: "closed", // closed, opened, logged in
+        notify: true,
+        //readOnly: true,
+      },
+
+      error: {
+        type: String,
+        notify: true,
+        //readOnly: true,
+      },
+
+      motd: {
+        type: Array,
+        notify: true,
+        //readOnly: true,
+        value: function () { return []; }
+      },
+
+      settings: {
+        type: Object,
+        notify: true,
+        //readOnly: true,
+        value: function () { return {}; }
+      },
+    },
+
+    login: function (user, password) {
+      if (this._socket) { throw "logout first"; }
+      this._socket = new WebSocket("ws://localhost:62953/fibs"); // TODO
+
+      this._socket.onopen = e => {
+        console.log("socket: logging in as " + user);
+        this.set("status", "opened");
+        this._socket.send("login " + user + " " + password);
+      };
+
+      this._socket.onmessage = e => {
+        //console.log("socket: message= " + e.data);
+        JSON.parse(e.data).forEach(message => {
+          this._process(message);
+        });
+      };
+
+      this._socket.onclose = e => {
+        console.log("socket: closed");
+        this._socket = undefined;
+        this.set("status", "closed");
+        this.set("error", undefined);
+        this.set("motd", []);
+        this.set("settings", {});
+      };
+
+      this._socket.onerror = e => {
+        console.log("socket: error= " + e.data);
+        this.set("error", "error"); // TODO
+      };
+    },
+
+    send: function (s) {
+      if (!this._socket) { throw "login first"; }
+      this._socket.send(s);
+    },
+
+    logout: function () {
+      console.log("logout");
+      if (this._socket) { this._socket.send("bye"); }
+    },
+
+    // TODO: break this up into sets, e.g. motdProcess, settingsProcess, etc.
+    _process: function (message) {
+      switch (message.cookie) {
+        case "CLIP_MOTD_BEGIN":
+          this.set("status", "logged in");
+          this.set("motd", []);
+          break;
+        case "FIBS_MOTD": this._onMotdLine(message); break;
+        case "CLIP_OWN_INFO": this._onOwnInfo(message); break;
+      }
+    },
+
+    _onMotdLine: function (message) {
+      // strip all of the ASCII box stuff from around the MOTD
+      let line = message.crumbs.message.trim();
+      if (line.startsWith("+")) { return; }
+      if (line.startsWith("|")) { line = line.substr(1); }
+      if (line.endsWith("|")) { line = line.substr(0, line.length - 1); }
+      line = line.trim();
+      if (line == "") { return; }
+      this.push("motd", line);
+    },
+
+    _onOwnInfo: function (message) {
+      let parseBool = s => s == "1";
+
+      this.set("settings.allowPip", parseBool(message.crumbs.allowPip));
+      //autoBoard: Boolean,
+      //autoDouble: Boolean,
+      //autoMove: Boolean,
+      //away: Boolean,
+      //bell: Boolean,
+      //crawford: Boolean,
+      //double: Boolean,
+      //experience: Number,
+      //greedy: Boolean,
+      //moreBoards: Boolean,
+      //moves: Boolean,
+      //notify: Boolean,
+      //rating: Number,
+      //ratings: Boolean,
+      //ready: Boolean,
+      //redoubles: String,
+      //report: Boolean,
+      //silent: Boolean,
+      //timezone: String,
+    },
+
+    //created: function() {
+    //  //this._app = document.querySelector("fibs-app");
+    //  //this.listen(this._app, "CLIP_OWN_INFO", "_onOwnInfo");
+    //  //this.listen(this._app, "FIBS_AllowpipTrue", "_onAllowPipTrue");
+    //  //this.listen(this._app, "FIBS_AllowpipFalse", "_onAllowPipFalse");
+    //},
+
+    //_onAllowPipTrue: function () {
+    //  this.settings.allowPip = true;
+    //},
+
+    //_onAllowPipFalse: function () {
+    //  this.settings.allowPip = false;
+    //},
+
+  });
+</script>

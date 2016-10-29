@@ -8,11 +8,13 @@
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="/src/login-view.html" />
-<link rel="import" href="/src/settings-view.html" />
+<link rel="import" href="fibs-client.html" />
+<link rel="import" href="login-view.html" />
+<link rel="import" href="settings-view.html" />
 
 <dom-module id="fibs-app">
   <template>
+    <fibs-client id="fibs-client" status="{{status}}" error="{{error}}" motd="{{motd}}" settings="{{settings}}"></fibs-client>
     <app-drawer-layout fullbleed>
       <!-- Drawer content -->
       <app-drawer>
@@ -31,64 +33,35 @@
           </app-toolbar>
         </app-header>
         <iron-pages selected="[[view]]" attr-for-selected="name" fallback-selection="login" role="main">
-          <login-view name="login"></login-view>
-          <settings-view name="settings"></settings-view>
+          <login-view name="login" status="[[status]]" error="[[error]]" motd="[[motd]]"></login-view>
+          <settings-view name="settings" settings="[[settings]]"></settings-view>
         </iron-pages>
       </app-header-layout>
     </app-drawer-layout>
   </template>
+
   <script>
     Polymer({
       is: "fibs-app",
 
-      properties: {
-        socketStatus: {
-          type: String,
-          value: "closed", // closed, opened, logged in as <user>
-          notify: true,
-        },
-      },
-
-      login: function (user, password) {
-        if (this._socket) { throw "logout first"; }
-
-        this._socket = new WebSocket("ws://localhost:62953/fibs");
-
-        this._socket.onopen = e => {
-          console.log("socket: logging in as " + user);
-          this.socketStatus = "opened";
-          this._socket.send("login " + user + " " + password);
-        };
-
-        this._socket.onmessage = e => {
-          //console.log("socket: message= " + e.data);
-          JSON.parse(e.data).forEach(message => {
-            if (message.cookie == "CLIP_MOTD_BEGIN") { this.socketStatus = "logged in as " + user; }
-            this.fire(message.cookie, message.crumbs);
+      created: function () {
+        // set up a little IoC infrastructure
+        // (of course, this all reduces to a global dictionary, which "window" already is...)
+        window.addService = (name, getServiceFn) => {
+          this.addEventListener(`get-${name}-service`, e => {
+            e.detail.service = getServiceFn(name);
           });
         };
 
-        this._socket.onclose = e => {
-          console.log("socket: closed");
-          this._socket = undefined;
-          this.socketStatus = "closed";
+        window.getService = name => {
+          let detail = { service: null };
+          this.fire(`get-${name}-service`, detail);
+          return detail.service;
         };
 
-        this._socket.onerror = e => {
-          console.log("socket: error= " + e.data);
-        };
+        // add the fibs-app services
+        addService("fibs-client", name => this.$[name]);
       },
-
-      send: function (s) {
-        if (!this._socket) { throw "login first"; }
-        this._socket.send(s);
-      },
-
-      logout: function () {
-        console.log("logout");
-        if (this._socket) { this._socket.send("bye"); }
-      },
-
 
     });
   </script>

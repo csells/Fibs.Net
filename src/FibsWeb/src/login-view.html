@@ -1,15 +1,54 @@
 ﻿<link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="fibs-login.html" />
-<link rel="import" href="fibs-motd.html" />
 
 <dom-module id="login-view">
   <template>
-    <fibs-login></fibs-login>
-    <fibs-motd></fibs-motd>
+    <form on-submit="_toggleLogin">
+      <div><span>user: <input value="{{user::input}}" /></span></div>
+      <div><span>password: <input value="{{password::input}}" type="password" /></span></div>
+      <div><input type="submit" value="[[_buttonName(status)]]" disabled="[[_buttonDisabled(user, password, status)]]" /></div>
+      <div>status: [[status]]</div>
+      <div>error: [[error]]</div>
+    </form>
+    <h1>Message of the Day</h1>
+    <template is="dom-repeat" items="[[motd]]" as="line">
+      <p>{{line}}</p>
+    </template>
   </template>
+
   <script>
     Polymer({
       is: "login-view",
+
+      properties: {
+        status: String,
+        error: String,
+        motd: Array,
+        user: String,
+        password: String,
+      },
+
+      ready: function () {
+        this._client = getService("fibs-client");
+      },
+
+      _buttonName: function (status) {
+        return status == "closed" ? "Login" : "Logout";
+      },
+
+      _buttonDisabled: function (user, password, status) {
+        return user == "" || password == "" || status == "opened";
+      },
+
+      _toggleLogin: function (e) {
+        // preventDefault first to preview the page from reloading in the event that
+        // there's an error in the rest of the function and I'll never see it
+        e.preventDefault();
+
+        if (this.status == "closed") { this._client.login(this.user, this.password); }
+        else { this._client.logout(); }
+      },
+
     });
+
   </script>
 </dom-module>
