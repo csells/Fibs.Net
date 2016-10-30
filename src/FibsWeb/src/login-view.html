@@ -23,8 +23,14 @@
         status: String,
         error: String,
         motd: Array,
-        user: String,
-        password: String,
+        user: {
+          type: String,
+          value: "dotnetcli", // TODO
+        },
+        password: {
+          type: String,
+          value: "dotnetcli1", // TODO
+        },
       },
 
       ready: function () {

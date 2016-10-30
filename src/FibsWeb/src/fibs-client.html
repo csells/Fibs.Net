@@ -11,28 +11,24 @@
     properties: {
       status: {
         type: String,
-        value: "closed", // closed, opened, logged in
+        value: "closed", // closed, opened, authenticated
         notify: true,
-        //readOnly: true,
       },
 
       error: {
         type: String,
         notify: true,
-        //readOnly: true,
       },
 
       motd: {
         type: Array,
         notify: true,
-        //readOnly: true,
         value: function () { return []; }
       },
 
       settings: {
         type: Object,
         notify: true,
-        //readOnly: true,
         value: function () { return {}; }
       },
     },
@@ -43,7 +39,7 @@
 
       this._socket.onopen = e => {
         console.log("socket: logging in as " + user);
-        this.set("status", "opened");
+        this.status = "opened";
         this._socket.send("login " + user + " " + password);
       };
 
@@ -57,15 +53,15 @@
       this._socket.onclose = e => {
         console.log("socket: closed");
         this._socket = undefined;
-        this.set("status", "closed");
-        this.set("error", undefined);
-        this.set("motd", []);
-        this.set("settings", {});
+        this.status = "closed";
+        this.error = undefined;
+        this.motd = [];
+        this.settings = {};
       };
 
       this._socket.onerror = e => {
         console.log("socket: error= " + e.data);
-        this.set("error", "error"); // TODO
+        this.error = "error"; // TODO
       };
     },
 
@@ -83,8 +79,8 @@
     _process: function (message) {
       switch (message.cookie) {
         case "CLIP_MOTD_BEGIN":
-          this.set("status", "logged in");
-          this.set("motd", []);
+          this.status = "authenticated";
+          this.motd = [];
           break;
         case "FIBS_MOTD": this._onMotdLine(message); break;
         case "CLIP_OWN_INFO": this._onOwnInfo(message); break;
@@ -105,6 +101,7 @@
     _onOwnInfo: function (message) {
       let parseBool = s => s == "1";
 
+      // NOTE: this.set seems to required for nested properties, e.g. obj.foo
       this.set("settings.allowPip", parseBool(message.crumbs.allowPip));
       //autoBoard: Boolean,
       //autoDouble: Boolean,
