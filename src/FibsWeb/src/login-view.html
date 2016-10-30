@@ -5,12 +5,14 @@
     <form on-submit="_toggleLogin">
       <div><span>user: <input value="{{user::input}}" /></span></div>
       <div><span>password: <input value="{{password::input}}" type="password" /></span></div>
-      <div><input type="submit" value="[[_buttonName(status)]]" disabled="[[_buttonDisabled(user, password, status)]]" /></div>
-      <div>status: [[status]]</div>
-      <div>error: [[error]]</div>
+      <div><input type="submit" value="[[_buttonName(session.status)]]" disabled="[[_buttonDisabled(user, password, session.status)]]" /></div>
+      <div>status: [[session.status]]</div>
+      <div>error: [[session.error]]</div>
+      <div>last login: [[session.lastLogin]]</div>
+      <div>last host: [[session.lastHost]]</div>
     </form>
     <h1>Message of the Day</h1>
-    <template is="dom-repeat" items="[[motd]]" as="line">
+    <template is="dom-repeat" items="[[session.motd]]" as="line">
       <p>{{line}}</p>
     </template>
   </template>
@@ -20,9 +22,7 @@
       is: "login-view",
 
       properties: {
-        status: String,
-        error: String,
-        motd: Array,
+        session: Object,
         user: {
           type: String,
           value: "dotnetcli", // TODO
@@ -34,7 +34,7 @@
       },
 
       ready: function () {
-        this._client = getService("fibs-client");
+        this._client = window.getService("fibs-client");
       },
 
       _buttonName: function (status) {
@@ -50,7 +50,7 @@
         // there's an error in the rest of the function and I'll never see it
         e.preventDefault();
 
-        if (this.status == "closed") { this._client.login(this.user, this.password); }
+        if (this.session.status == "closed") { this._client.login(this.user, this.password); }
         else { this._client.logout(); }
       },
 

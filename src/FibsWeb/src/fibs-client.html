@@ -9,21 +9,10 @@
     },
 
     properties: {
-      status: {
-        type: String,
-        value: "closed", // closed, opened, authenticated
+      session: {
+        type: Object,
         notify: true,
-      },
-
-      error: {
-        type: String,
-        notify: true,
-      },
-
-      motd: {
-        type: Array,
-        notify: true,
-        value: function () { return []; }
+        value: function () { return { status: "closed" }; } // status = closed|opened|authenticated
       },
 
       settings: {
@@ -39,29 +28,29 @@
 
       this._socket.onopen = e => {
         console.log("socket: logging in as " + user);
-        this.status = "opened";
+        this.set("session.status", "opened");
         this._socket.send("login " + user + " " + password);
       };
 
       this._socket.onmessage = e => {
         //console.log("socket: message= " + e.data);
         JSON.parse(e.data).forEach(message => {
-          this._process(message);
+          this._processSession(message);
+          this._processSettings(message);
+          this._processWho(message);
         });
       };
 
       this._socket.onclose = e => {
         console.log("socket: closed");
         this._socket = undefined;
-        this.status = "closed";
-        this.error = undefined;
-        this.motd = [];
+        this.session = { status: "closed" };
         this.settings = {};
       };
 
       this._socket.onerror = e => {
-        console.log("socket: error= " + e.data);
-        this.error = "error"; // TODO
+        console.log("socket: error");
+        this.set("session.error", "error"); // TODO
       };
     },
 
@@ -75,27 +64,17 @@
       if (this._socket) { this._socket.send("bye"); }
     },
 
-    _process: function (message) {
-      this._processStatus(message);
-      this._processMotd(message);
-      this._processSettings(message);
-      this._processWho(message);
-    },
+    //#region session
+    _processSession: function (message) {
+      let parseTimestamp = s => new Date(parseInt(s)*1000);
 
-    //#region status
-    _processStatus: function (message) {
       switch (message.cookie) {
-        case "CLIP_MOTD_BEGIN":
-          this.status = "authenticated";
+        case "CLIP_WELCOME":
+          this.set("session.status", "authenticated");
+          this.set("session.lastLogin", parseTimestamp(message.crumbs.lastLogin));
+          this.set("session.lastHost", message.crumbs.lastHost);
+          this.set("session.motd", []);
           break;
-      }
-    },
-    //#endregion
-
-    //#region MOTD
-    _processMotd: function (message) {
-      switch (message.cookie) {
-        case "CLIP_MOTD_BEGIN": this.motd = []; break;
 
         case "FIBS_MOTD":
           // strip all of the ASCII box stuff from around the MOTD
@@ -105,7 +84,7 @@
           if (line.endsWith("|")) { line = line.substr(0, line.length - 1); }
           line = line.trim();
           if (line == "") { return; }
-          this.push("motd", line);
+          this.push("session.motd", line);
       }
     },
     //#endregion

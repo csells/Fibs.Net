@@ -14,7 +14,7 @@
 
 <dom-module id="fibs-app">
   <template>
-    <fibs-client id="fibs-client" status="{{status}}" error="{{error}}" motd="{{motd}}" settings="{{settings}}"></fibs-client>
+    <fibs-client id="fibs-client" session="{{session}}" settings="{{settings}}"></fibs-client>
     <app-drawer-layout fullbleed>
       <!-- Drawer content -->
       <app-drawer>
@@ -33,7 +33,7 @@
           </app-toolbar>
         </app-header>
         <iron-pages selected="[[view]]" attr-for-selected="name" fallback-selection="login" role="main">
-          <login-view name="login" status="[[status]]" error="[[error]]" motd="[[motd]]"></login-view>
+          <login-view name="login" session="[[session]]"></login-view>
           <settings-view name="settings" settings="[[settings]]"></settings-view>
         </iron-pages>
       </app-header-layout>
