@@ -45,18 +45,14 @@
       is: "fibs-app",
 
       created: function () {
-        // set up a little IoC infrastructure
-        // (of course, this all reduces to a global dictionary, which "window" already is...)
+        // set up a little IoC infrastructure aka global variables
         window.addService = (name, getServiceFn) => {
-          this.addEventListener(`get-${name}-service`, e => {
-            e.detail.service = getServiceFn(name);
-          });
+          if (!window._serviceGetters) { window._serviceGetters = []; }
+          window._serviceGetters[name] = getServiceFn;
         };
 
         window.getService = name => {
-          let detail = { service: null };
-          this.fire(`get-${name}-service`, detail);
-          return detail.service;
+          return window._serviceGetters[name](name);
         };
 
         // add the fibs-app services
