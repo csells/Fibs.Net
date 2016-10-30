@@ -75,27 +75,48 @@
       if (this._socket) { this._socket.send("bye"); }
     },
 
-    // TODO: break this up into sets, e.g. motdProcess, settingsProcess, etc.
     _process: function (message) {
+      this._processStatus(message);
+      this._processMotd(message);
+      this._processSettings(message);
+      this._processWho(message);
+    },
+
+    //#region status
+    _processStatus: function (message) {
       switch (message.cookie) {
         case "CLIP_MOTD_BEGIN":
           this.status = "authenticated";
-          this.motd = [];
           break;
-        case "FIBS_MOTD": this._onMotdLine(message); break;
-        case "CLIP_OWN_INFO": this._onOwnInfo(message); break;
       }
     },
+    //#endregion
 
-    _onMotdLine: function (message) {
-      // strip all of the ASCII box stuff from around the MOTD
-      let line = message.crumbs.message.trim();
-      if (line.startsWith("+")) { return; }
-      if (line.startsWith("|")) { line = line.substr(1); }
-      if (line.endsWith("|")) { line = line.substr(0, line.length - 1); }
-      line = line.trim();
-      if (line == "") { return; }
-      this.push("motd", line);
+    //#region MOTD
+    _processMotd: function (message) {
+      switch (message.cookie) {
+        case "CLIP_MOTD_BEGIN": this.motd = []; break;
+
+        case "FIBS_MOTD":
+          // strip all of the ASCII box stuff from around the MOTD
+          let line = message.crumbs.message.trim();
+          if (line.startsWith("+")) { return; }
+          if (line.startsWith("|")) { line = line.substr(1); }
+          if (line.endsWith("|")) { line = line.substr(0, line.length - 1); }
+          line = line.trim();
+          if (line == "") { return; }
+          this.push("motd", line);
+      }
+    },
+    //#endregion
+
+    //#region settings
+    _processSettings: function (message) {
+      switch (message.cookie) {
+        case "CLIP_OWN_INFO": this._onOwnInfo(message); break;
+        case "FIBS_AllowpipTrue": this._onSettingValue(message); break;
+        case "FIBS_AllowpipFalse": this._onSettingValue(message); break;
+      }
     },
 
     _onOwnInfo: function (message) {
@@ -124,20 +145,19 @@
       //timezone: String,
     },
 
-    //created: function() {
-    //  //this._app = document.querySelector("fibs-app");
-    //  //this.listen(this._app, "CLIP_OWN_INFO", "_onOwnInfo");
-    //  //this.listen(this._app, "FIBS_AllowpipTrue", "_onAllowPipTrue");
-    //  //this.listen(this._app, "FIBS_AllowpipFalse", "_onAllowPipFalse");
-    //},
+    _onSettingValue: function (message) {
+      switch (message.cookie) {
+        case "FIBS_AllowpipTrue": this.set("settings.allowPip", true); break;
+        case "FIBS_AllowpipFalse": this.set("settings.allowPip", false); break;
+        default: throw `unknown setting: ${message.cookie}`;
+      }
+    },
+    //#endregion
 
-    //_onAllowPipTrue: function () {
-    //  this.settings.allowPip = true;
-    //},
-
-    //_onAllowPipFalse: function () {
-    //  this.settings.allowPip = false;
-    //},
+    //#region who
+    _processWho: function (message) {
+    },
+    //#endregion
 
   });
 </script>
