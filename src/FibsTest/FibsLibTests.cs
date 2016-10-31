@@ -376,6 +376,16 @@ namespace FibsTest {
     }
 
     [Fact]
+    public void FIBS_SettingsYoureNotAway() {
+      var monster = CreateLoggedInCookieMonster();
+      var s = "** You're not away.";
+      var cm = monster.EatCookie(s);
+      Assert.Equal(FibsCookie.FIBS_SettingsValue, cm.Cookie);
+      Assert.Equal("away", cm.Crumbs["name"]);
+      Assert.False(CookieMonster.ParseBool(cm.Crumbs["value"]));
+    }
+
+    [Fact]
     public void FIBS_SettingsValueToggleToYes() {
       var monster = CreateLoggedInCookieMonster();
       var togglePhrases = new Dictionary<string, string> {
@@ -383,6 +393,7 @@ namespace FibsTest {
         ["autoboard"] = "** The board will be refreshed after every move.",
         ["autodouble"] = "** You agree that doublets during opening double the cube.",
         ["automove"] = "** Forced moves will be done automatically.",
+        ["away"] = "You're away. Please type 'back'",
         ["bell"] = "** Your terminal will ring the bell if someone talks to you or invites you",
         ["crawford"] = "** You insist on playing with the Crawford rule.",
         ["double"] = "** You will be asked if you want to double.",
@@ -414,6 +425,7 @@ namespace FibsTest {
         ["autoboard"] = "** The board won't be refreshed after every move.",
         ["autodouble"] = "** You don't agree that doublets during opening double the cube.",
         ["automove"] = "** Forced moves won't be done automatically.",
+        ["away"] = "Welcome back.",
         ["bell"] = "** Your terminal won't ring the bell if someone talks to you or invites you",
         ["crawford"] = "** You would like to play without using the Crawford rule.",
         ["double"] = "** You won't be asked if you want to double.",

@@ -7,7 +7,7 @@
     <paper-checkbox name="autoboard" checked="[[settings.autoboard]]" on-change="_toggle">autoboard</paper-checkbox>
     <paper-checkbox name="autodouble" checked="[[settings.autodouble]]" on-change="_toggle">autodouble</paper-checkbox>
     <paper-checkbox name="automove" checked="[[settings.automove]]" on-change="_toggle">automove</paper-checkbox>
-    <div>away: [[settings.away]]</div>
+    <paper-checkbox name="away" checked="[[settings.away]]" on-change="_toggleAway">away</paper-checkbox>
     <paper-checkbox name="bell" checked="[[settings.bell]]" on-change="_toggle">bell</paper-checkbox>
     <paper-checkbox name="crawford" checked="[[settings.crawford]]" on-change="_toggle">crawford</paper-checkbox>
     <paper-checkbox name="double" checked="[[settings.double]]" on-change="_toggle">double</paper-checkbox>
@@ -40,7 +40,12 @@
       },
 
       _toggle: function (e) {
-        this._client.send(`toggle ${e.target.name}`);
+        this._client.toggleSetting(e.target.name);
+      },
+
+      _toggleAway: function (e) {
+        // TODO: let user provide an away string
+        this._client.setAway(e.target.checked ? "away" : null);
       },
 
     });

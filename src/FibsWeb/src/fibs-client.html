@@ -59,7 +59,7 @@
       this._socket.onopen = e => {
         console.log("socket: logging in as " + user);
         this.set("session.status", "opened");
-        this._socket.send("login " + user + " " + password);
+        this._send("login " + user + " " + password);
       };
 
       this._socket.onmessage = e => {
@@ -84,14 +84,23 @@
       };
     },
 
-    send: function (s) {
-      if (!this._socket) { throw "login first"; }
-      this._socket.send(s);
-    },
-
     logout: function () {
       console.log("logout");
-      if (this._socket) { this._socket.send("bye"); }
+      this._send("bye");
+    },
+
+    toggleSetting: function (name) {
+      this._send(`toggle ${name}`);
+    },
+
+    setAway: function (message) {
+      if (message) { this._send(`away ${message}`); }
+      else { this._send("back"); }
+    },
+
+    _send: function (s) {
+      if (!this._socket) { throw "login first"; }
+      this._socket.send(s);
     },
 
     //#region session
@@ -128,6 +137,7 @@
 
         case "FIBS_SettingsValue":
         case "FIBS_SettingsToggle":
+          console.log(`setting: ${message.crumbs.name}= ${message.crumbs.value}`);
           let m = {};
           m[message.crumbs.name] = message.crumbs.value;
           this._setCrumbSettings(m);

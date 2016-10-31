@@ -303,7 +303,6 @@ namespace Fibs {
       new CookieDough { Cookie = FibsCookie.FIBS_Waves, Regex = new Regex("^You wave goodbye"), },
       new CookieDough { Cookie = FibsCookie.FIBS_WavesAgain, Regex = new Regex("^You wave goodbye again and log out"), },
       new CookieDough { Cookie = FibsCookie.FIBS_NoSavedGames, Regex = new Regex("^no saved games"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_TypeBack, Regex = new Regex("^You're away\\. Please type 'back'"), },
       new CookieDough { Cookie = FibsCookie.FIBS_SavedMatch, Regex = new Regex("^  (?<player1>[a-zA-Z_<>]+) +(?<score1>[0-9]+) +(?<score2>[0-9]+) +- +(?<something>.*)"), },
       new CookieDough { Cookie = FibsCookie.FIBS_SavedMatchPlaying, Regex = new Regex("^ \\*[a-zA-Z_<>]+ +[0-9]+ +[0-9]+ +- +"), },
       // NOTE: for FIBS_SavedMatchReady, see the Stars message, because it will appear to be one of those (has asterisk at index 0).
@@ -344,6 +343,8 @@ namespace Fibs {
       new CookieDough { Cookie = FibsCookie.FIBS_Goodbye, Regex = new Regex("(?<message>           Goodbye\\.)"), },
       new CookieDough { Cookie = FibsCookie.FIBS_LastLogin, Regex = new Regex("^  Last login:"), },
       new CookieDough { Cookie = FibsCookie.FIBS_NoInfo, Regex = new Regex("^No information found on user"), },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^You're away\\. Please type 'back'"), Extras = new Dictionary<string, string> { ["name"] = "away", ["value"] = "YES" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^Welcome back\\."), Extras = new Dictionary<string, string> { ["name"] = "away", ["value"] = "NO" } },
     };
 
     //--- Numeric messages ---------------------------------------------------
@@ -458,6 +459,7 @@ namespace Fibs {
       new CookieDough { Cookie = FibsCookie.FIBS_CantGagYourself, Regex = new Regex("^\\*\\* You talk too much, don't you\\?"), },
       new CookieDough { Cookie = FibsCookie.FIBS_CantBlindYourself, Regex = new Regex("^\\*\\* You can't read this message now, can you\\?"), },
       new CookieDough { Cookie = FibsCookie.FIBS_RunningDiceTest, Regex = new Regex("^\\*\\*\\* running dice test:"), },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsValue, Regex = new Regex("^\\*\\* You're not away\\."), Extras = new Dictionary<string, string> { ["name"] = "away", ["value"] = "NO" } },
     };
 
     // for LOGIN_STATE
@@ -571,7 +573,6 @@ namespace Fibs {
     FIBS_CantBlindYourself,
     FIBS_CantGagYourself,
     FIBS_WontListen,
-    FIBS_TypeBack,
     FIBS_NoOne,
     FIBS_BadMove,
     FIBS_MustMove,
