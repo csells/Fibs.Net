@@ -123,22 +123,22 @@
     _processSettings: function (message) {
       switch (message.cookie) {
         case "CLIP_OWN_INFO":
-          this._setCrumbSettings(message);
+          this._setCrumbSettings(message.crumbs);
           break;
 
         case "FIBS_SettingsValue":
         case "FIBS_SettingsToggle":
-          let m = { crumbs: {} };
-          m.crumbs[message.crumbs.name] = message.crumbs.value;
+          let m = {};
+          m[message.crumbs.name] = message.crumbs.value;
           this._setCrumbSettings(m);
           break;
       }
     },
 
-    _setCrumbSettings: function (message) {
-      Object.keys(message.crumbs).filter(n => n != "name").forEach(name => {
+    _setCrumbSettings: function (crumbs) {
+      Object.keys(crumbs).filter(n => n != "name").forEach(name => {
         let parse = this._settingsParsers[name];
-        let value = parse(message.crumbs[name]);
+        let value = parse(crumbs[name]);
 
         // NOTE: this.set() is required for nested properties, e.g. obj.foo
         this.set(`settings.${name}`, value);
