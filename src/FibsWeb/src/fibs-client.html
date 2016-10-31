@@ -62,6 +62,10 @@
         timezone: parseString,
         wrap: parseBool,
       };
+
+      // request queuing goo
+      this._awaitingResponse = false;
+      this._queue = []
     },
 
     login: function (user, password) {
@@ -75,12 +79,16 @@
       };
 
       this._socket.onmessage = e => {
+        this._awaitingResponse = false;
+
         //console.log("socket: message= " + e.data);
         JSON.parse(e.data).forEach(message => {
           this._processSession(message);
           this._processSettings(message);
           this._processWho(message);
         });
+
+        this._checksend();
       };
 
       this._socket.onclose = e => {
@@ -122,7 +130,16 @@
 
     _send: function (s) {
       if (!this._socket) { throw "login first"; }
-      console.log(`send: '${s}'`);
+      console.log(`queue: ${s}`);
+      this._queue.push(s);
+      this._checksend();
+    },
+
+    _checksend: function () {
+      if (this._awaitingResponse || this._queue.length == 0) { return; }
+      var s = this._queue.shift();
+      this._awaitingResponse = true;
+      console.log(`send: ${s}`);
       this._socket.send(s);
     },
 
