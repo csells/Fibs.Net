@@ -1,7 +1,15 @@
 ﻿<link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
 
 <dom-module id="settings-view">
+  <style>
+    paper-checkbox {
+      display: block;
+    }
+  </style>
   <template>
     <paper-checkbox name="allowpip" checked="[[settings.allowpip]]" on-change="_toggle">allowpip</paper-checkbox>
     <paper-checkbox name="autoboard" checked="[[settings.autoboard]]" on-change="_toggle">autoboard</paper-checkbox>
@@ -19,11 +27,24 @@
     <div>rating: [[settings.rating]]</div>
     <paper-checkbox name="ratings" checked="[[settings.ratings]]" on-change="_toggle">ratings</paper-checkbox>
     <paper-checkbox name="ready" checked="[[settings.ready]]" on-change="_toggle">ready</paper-checkbox>
-    <div>redoubles: [[settings.redoubles]]</div>
+    <paper-dropdown-menu name="redoubles" label="redoubles">
+      <paper-listbox class="dropdown-content" attr-for-selected="name" selected="[[settings.redoubles]]" on-iron-select="_setRedoubles">
+        <template is="dom-repeat" items="[[_client.redoublesValues]]">
+          <paper-item name="[[item]]">[[item]]</paper-item>
+        </template>
+      </paper-listbox>
+    </paper-dropdown-menu>
     <paper-checkbox name="report" checked="[[settings.report]]" on-change="_toggle">report</paper-checkbox>
     <paper-checkbox name="silent" checked="[[settings.silent]]" on-change="_toggle">silent</paper-checkbox>
     <paper-checkbox name="telnet" checked="[[settings.telnet]]" on-change="_toggle">telnet</paper-checkbox>
     <div>timezone: [[settings.timezone]]</div>
+    <paper-dropdown-menu name="timezone" label="timezone">
+      <paper-listbox class="dropdown-content" attr-for-selected="name" selected="[[settings.timezone]]" on-iron-select="_setTimezone">
+        <template is="dom-repeat" items="[[_client.timezoneValues]]">
+          <paper-item name="[[item]]">[[item]]</paper-item>
+        </template>
+      </paper-listbox>
+    </paper-dropdown-menu>
     <paper-checkbox name="wrap" checked="[[settings.wrap]]" on-change="_toggle">wrap</paper-checkbox>
   </template>
 
@@ -46,6 +67,16 @@
       _toggleAway: function (e) {
         // TODO: let user provide an away string
         this._client.setAway(e.target.checked ? "away" : null);
+      },
+
+      _setRedoubles: function (e) {
+        let redoubles = e.target.selected;
+        if (this._client.settings.redoubles != redoubles) { this._client.setRedoubles(redoubles); }
+      },
+
+      _setTimezone: function (e) {
+        let timezone = e.target.selected;
+        if (this._client.settings.timezone != timezone) { this._client.setTimezone(timezone); }
       },
 
     });

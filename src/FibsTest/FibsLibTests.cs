@@ -386,9 +386,9 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void FIBS_SettingsValueToggleToYes() {
+    public void FIBS_SettingsValueChangeToYes() {
       var monster = CreateLoggedInCookieMonster();
-      var togglePhrases = new Dictionary<string, string> {
+      var settingPhrases = new Dictionary<string, string> {
         ["allowpip"] = "** You allow the use the server's 'pip' command.",
         ["autoboard"] = "** The board will be refreshed after every move.",
         ["autodouble"] = "** You agree that doublets during opening double the cube.",
@@ -409,18 +409,18 @@ namespace FibsTest {
         ["wrap"] = "** The server will wrap long lines.",
       };
 
-      foreach (var pair in togglePhrases) {
+      foreach (var pair in settingPhrases) {
         var cm = monster.EatCookie(pair.Value);
-        Assert.Equal(FibsCookie.FIBS_SettingsToggle, cm.Cookie);
+        Assert.Equal(FibsCookie.FIBS_SettingsChange, cm.Cookie);
         Assert.Equal(pair.Key, cm.Crumbs["name"]);
         Assert.True(CookieMonster.ParseBool(cm.Crumbs["value"]), $"{cm.Crumbs["name"]}= {cm.Crumbs["value"]}");
       }
     }
 
     [Fact]
-    public void FIBS_SettingsValueToggleToNo() {
+    public void FIBS_SettingsValueChangeToNo() {
       var monster = CreateLoggedInCookieMonster();
-      var togglePhrases = new Dictionary<string, string> {
+      var settingPhrases = new Dictionary<string, string> {
         ["allowpip"] = "** You don't allow the use of the server's 'pip' command.",
         ["autoboard"] = "** The board won't be refreshed after every move.",
         ["autodouble"] = "** You don't agree that doublets during opening double the cube.",
@@ -441,12 +441,48 @@ namespace FibsTest {
         ["wrap"] = "** Your terminal knows how to wrap long lines.",
       };
 
-      foreach (var pair in togglePhrases) {
+      foreach (var pair in settingPhrases) {
         var cm = monster.EatCookie(pair.Value);
-        Assert.Equal(FibsCookie.FIBS_SettingsToggle, cm.Cookie);
+        Assert.Equal(FibsCookie.FIBS_SettingsChange, cm.Cookie);
         Assert.Equal(pair.Key, cm.Crumbs["name"]);
         Assert.False(CookieMonster.ParseBool(cm.Crumbs["value"]), $"{cm.Crumbs["name"]}= {cm.Crumbs["value"]}");
       }
+    }
+
+    public void FIBS_RedoublesChangeToNone() {
+      var monster = CreateLoggedInCookieMonster();
+      var s = "Value of 'redoubles' set to 'none'.";
+      var cm = monster.EatCookie(s);
+      Assert.Equal(FibsCookie.FIBS_SettingsChange, cm.Cookie);
+      Assert.Equal("redoubles", cm.Crumbs["name"]);
+      Assert.Equal(0, int.Parse(cm.Crumbs["value"]));
+    }
+
+    public void FIBS_RedoublesChangeToNumber() {
+      var monster = CreateLoggedInCookieMonster();
+      var s = "Value of 'redoubles' set to 42.";
+      var cm = monster.EatCookie(s);
+      Assert.Equal(FibsCookie.FIBS_SettingsChange, cm.Cookie);
+      Assert.Equal("redoubles", cm.Crumbs["name"]);
+      Assert.Equal(42, int.Parse(cm.Crumbs["value"]));
+    }
+
+    public void FIBS_RedoublesChangeToUnlimited() {
+      var monster = CreateLoggedInCookieMonster();
+      var s = "Value of 'redoubles' set to 'unlimited'.";
+      var cm = monster.EatCookie(s);
+      Assert.Equal(FibsCookie.FIBS_SettingsChange, cm.Cookie);
+      Assert.Equal("redoubles", cm.Crumbs["name"]);
+      Assert.Equal("unlimited", cm.Crumbs["value"]);
+    }
+
+    public void FIBS_TimezoneChange() {
+      var monster = CreateLoggedInCookieMonster();
+      var s = "Value of 'timezone' set to America/Los_Angeles.";
+      var cm = monster.EatCookie(s);
+      Assert.Equal(FibsCookie.FIBS_SettingsChange, cm.Cookie);
+      Assert.Equal("timezone", cm.Crumbs["name"]);
+      Assert.Equal("America/Los_Angeles", cm.Crumbs["value"]);
     }
 
   }
