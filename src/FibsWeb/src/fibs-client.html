@@ -157,6 +157,7 @@
         case "CLIP_OWN_INFO":
           delete message.crumbs.name; // not a setting
           this._setCrumbSettings(message.crumbs);
+          this._ensureClientSettings();
           break;
 
         case "FIBS_SettingsChange":
@@ -176,6 +177,15 @@
         // NOTE: this.set() is required for nested properties, e.g. obj.foo
         this.set(`settings.${name}`, value);
       });
+    },
+
+    // ensure the required values are set up for the client
+    _ensureClientSettings: function () {
+      if (!this.settings.autoboard) { this.toggleSetting("autoboard"); }
+      if (this.settings.bell) { this.toggleSetting("bell"); }
+      if (!this.settings.moreboards) { this.toggleSetting("moreboards"); }
+      if (!this.settings.notify) { this.toggleSetting("notify"); }
+      if (!this.settings.report) { this.toggleSetting("report"); }
     },
     //#endregion
 

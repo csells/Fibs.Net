@@ -11,19 +11,20 @@
     }
   </style>
   <template>
+    <!-- NOTE: disabled properties can't be set by the user; they're needed for the app or don't make sense -->
     <paper-checkbox name="allowpip" checked="[[settings.allowpip]]" on-change="_toggle">allowpip</paper-checkbox>
-    <paper-checkbox name="autoboard" checked="[[settings.autoboard]]" on-change="_toggle">autoboard</paper-checkbox>
+    <paper-checkbox name="autoboard" checked="[[settings.autoboard]]" on-change="_toggle" disabled>autoboard</paper-checkbox>
     <paper-checkbox name="autodouble" checked="[[settings.autodouble]]" on-change="_toggle">autodouble</paper-checkbox>
     <paper-checkbox name="automove" checked="[[settings.automove]]" on-change="_toggle">automove</paper-checkbox>
     <paper-checkbox name="away" checked="[[settings.away]]" on-change="_toggleAway">away</paper-checkbox>
-    <paper-checkbox name="bell" checked="[[settings.bell]]" on-change="_toggle">bell</paper-checkbox>
+    <paper-checkbox name="bell" checked="[[settings.bell]]" on-change="_toggle" disabled>bell</paper-checkbox>
     <paper-checkbox name="crawford" checked="[[settings.crawford]]" on-change="_toggle">crawford</paper-checkbox>
     <paper-checkbox name="double" checked="[[settings.double]]" on-change="_toggle">double</paper-checkbox>
     <div>experience: [[settings.experience]]</div>
     <paper-checkbox name="greedy" checked="[[settings.greedy]]" on-change="_toggle">greedy</paper-checkbox>
-    <paper-checkbox name="moreboards" checked="[[settings.moreboards]]" on-change="_toggle">moreboards</paper-checkbox>
+    <paper-checkbox name="moreboards" checked="[[settings.moreboards]]" on-change="_toggle" disabled>moreboards</paper-checkbox>
     <paper-checkbox name="moves" checked="[[settings.moves]]" on-change="_toggle">moves</paper-checkbox>
-    <paper-checkbox name="notify" checked="[[settings.notify]]" on-change="_toggle">notify</paper-checkbox>
+    <paper-checkbox name="notify" checked="[[settings.notify]]" on-change="_toggle" disabled>notify</paper-checkbox>
     <div>rating: [[settings.rating]]</div>
     <paper-checkbox name="ratings" checked="[[settings.ratings]]" on-change="_toggle">ratings</paper-checkbox>
     <paper-checkbox name="ready" checked="[[settings.ready]]" on-change="_toggle">ready</paper-checkbox>
@@ -36,7 +37,7 @@
     </paper-dropdown-menu>
     <paper-checkbox name="report" checked="[[settings.report]]" on-change="_toggle">report</paper-checkbox>
     <paper-checkbox name="silent" checked="[[settings.silent]]" on-change="_toggle">silent</paper-checkbox>
-    <paper-checkbox name="telnet" checked="[[settings.telnet]]" on-change="_toggle">telnet</paper-checkbox>
+    <paper-checkbox name="telnet" checked="[[settings.telnet]]" on-change="_toggle" disabled>telnet</paper-checkbox>
     <div>timezone: [[settings.timezone]]</div>
     <paper-dropdown-menu name="timezone" label="timezone">
       <paper-listbox class="dropdown-content" attr-for-selected="name" selected="[[settings.timezone]]" on-iron-select="_setTimezone">
@@ -45,7 +46,7 @@
         </template>
       </paper-listbox>
     </paper-dropdown-menu>
-    <paper-checkbox name="wrap" checked="[[settings.wrap]]" on-change="_toggle">wrap</paper-checkbox>
+    <paper-checkbox name="wrap" checked="[[settings.wrap]]" on-change="_toggle" disabled>wrap</paper-checkbox>
   </template>
 
   <script>
