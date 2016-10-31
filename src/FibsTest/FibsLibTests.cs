@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Fibs;
 using Xunit;
 
@@ -49,17 +50,17 @@ namespace FibsTest {
 
       Assert.Equal(FibsCookie.CLIP_OWN_INFO, cm.Cookie);
       Assert.Equal("myself", cm.Crumbs["name"]);
-      Assert.True(CookieMonster.ParseBool(cm.Crumbs["allowPip"]));
-      Assert.True(CookieMonster.ParseBool(cm.Crumbs["autoBoard"]));
-      Assert.False(CookieMonster.ParseBool(cm.Crumbs["autoDouble"]));
-      Assert.False(CookieMonster.ParseBool(cm.Crumbs["autoMove"]));
+      Assert.True(CookieMonster.ParseBool(cm.Crumbs["allowpip"]));
+      Assert.True(CookieMonster.ParseBool(cm.Crumbs["autoboard"]));
+      Assert.False(CookieMonster.ParseBool(cm.Crumbs["autodouble"]));
+      Assert.False(CookieMonster.ParseBool(cm.Crumbs["automove"]));
       Assert.False(CookieMonster.ParseBool(cm.Crumbs["away"]));
       Assert.False(CookieMonster.ParseBool(cm.Crumbs["bell"]));
       Assert.True(CookieMonster.ParseBool(cm.Crumbs["crawford"]));
       Assert.True(CookieMonster.ParseBool(cm.Crumbs["double"]));
       Assert.Equal(2396, int.Parse(cm.Crumbs["experience"]));
       Assert.False(CookieMonster.ParseBool(cm.Crumbs["greedy"]));
-      Assert.True(CookieMonster.ParseBool(cm.Crumbs["moreBoards"]));
+      Assert.True(CookieMonster.ParseBool(cm.Crumbs["moreboards"]));
       Assert.False(CookieMonster.ParseBool(cm.Crumbs["moves"]));
       Assert.True(CookieMonster.ParseBool(cm.Crumbs["notify"]));
       Assert.Equal(3457.85, double.Parse(cm.Crumbs["rating"]));
@@ -352,6 +353,88 @@ namespace FibsTest {
       var cm = monster.EatCookie(s);
       Assert.Equal(FibsCookie.FIBS_NoOne, cm.Cookie);
       Assert.Equal("playerOne", cm.Crumbs["name"]);
+    }
+
+    [Fact]
+    public void FIBS_SettingsValueYes() {
+      var monster = CreateLoggedInCookieMonster();
+      var s = "allowpip        YES";
+      var cm = monster.EatCookie(s);
+      Assert.Equal(FibsCookie.FIBS_SettingsValue, cm.Cookie);
+      Assert.Equal("allowpip", cm.Crumbs["name"]);
+      Assert.True(CookieMonster.ParseBool(cm.Crumbs["value"]));
+    }
+
+    [Fact]
+    public void FIBS_SettingsValueNo() {
+      var monster = CreateLoggedInCookieMonster();
+      var s = "autodouble      NO";
+      var cm = monster.EatCookie(s);
+      Assert.Equal(FibsCookie.FIBS_SettingsValue, cm.Cookie);
+      Assert.Equal("autodouble", cm.Crumbs["name"]);
+      Assert.False(CookieMonster.ParseBool(cm.Crumbs["value"]));
+    }
+
+    [Fact]
+    public void FIBS_SettingsValueToggleToYes() {
+      var monster = CreateLoggedInCookieMonster();
+      var togglePhrases = new Dictionary<string, string> {
+        ["allowpip"] = "** You allow the use the server's 'pip' command.",
+        ["autoboard"] = "** The board will be refreshed after every move.",
+        ["autodouble"] = "** You agree that doublets during opening double the cube.",
+        ["automove"] = "** Forced moves will be done automatically.",
+        ["bell"] = "** Your terminal will ring the bell if someone talks to you or invites you",
+        ["crawford"] = "** You insist on playing with the Crawford rule.",
+        ["double"] = "** You will be asked if you want to double.",
+        ["greedy"] = "** Will use automatic greedy bearoffs.",
+        ["moreboards"] = "** Will send rawboards after rolling.",
+        ["moves"] = "** You want a list of moves after this game.",
+        ["notify"] = "** You'll be notified when new users log in.",
+        ["ratings"] = "** You'll see how the rating changes are calculated.",
+        ["ready"] = "** You're now ready to invite or join someone.",
+        ["report"] = "** You will be informed about starting and ending matches.",
+        ["silent"] = "** You will hear what other players shout.",
+        ["telnet"] = "** You use telnet and don't need extra 'newlines'.",
+        ["wrap"] = "** The server will wrap long lines.",
+      };
+
+      foreach (var pair in togglePhrases) {
+        var cm = monster.EatCookie(pair.Value);
+        Assert.Equal(FibsCookie.FIBS_SettingsToggle, cm.Cookie);
+        Assert.Equal(pair.Key, cm.Crumbs["name"]);
+        Assert.True(CookieMonster.ParseBool(cm.Crumbs["value"]), $"{cm.Crumbs["name"]}= {cm.Crumbs["value"]}");
+      }
+    }
+
+    [Fact]
+    public void FIBS_SettingsValueToggleToNo() {
+      var monster = CreateLoggedInCookieMonster();
+      var togglePhrases = new Dictionary<string, string> {
+        ["allowpip"] = "** You don't allow the use of the server's 'pip' command.",
+        ["autoboard"] = "** The board won't be refreshed after every move.",
+        ["autodouble"] = "** You don't agree that doublets during opening double the cube.",
+        ["automove"] = "** Forced moves won't be done automatically.",
+        ["bell"] = "** Your terminal won't ring the bell if someone talks to you or invites you",
+        ["crawford"] = "** You would like to play without using the Crawford rule.",
+        ["double"] = "** You won't be asked if you want to double.",
+        ["greedy"] = "** Won't use automatic greedy bearoffs.",
+        ["moreboards"] = "** Won't send rawboards after rolling.",
+        ["moves"] = "** You won't see a list of moves after this game.",
+        ["notify"] = "** You won't be notified when new users log in.",
+        ["ratings"] = "** You won't see how the rating changes are calculated.",
+        ["ready"] = "** You're now refusing to play with someone.",
+        ["report"] = "** You won't be informed about starting and ending matches.",
+        ["silent"] = "** You won't hear what other players shout.",
+        ["telnet"] = "** You use a client program and will receive extra 'newlines'.",
+        ["wrap"] = "** Your terminal knows how to wrap long lines.",
+      };
+
+      foreach (var pair in togglePhrases) {
+        var cm = monster.EatCookie(pair.Value);
+        Assert.Equal(FibsCookie.FIBS_SettingsToggle, cm.Cookie);
+        Assert.Equal(pair.Key, cm.Crumbs["name"]);
+        Assert.False(CookieMonster.ParseBool(cm.Crumbs["value"]), $"{cm.Crumbs["name"]}= {cm.Crumbs["value"]}");
+      }
     }
 
   }

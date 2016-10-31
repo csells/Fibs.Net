@@ -22,6 +22,36 @@
       },
     },
 
+    ready: function () {
+      let parseBool = s => s == "1" || s == "YES";
+      let parseString = s => s;
+
+      this._settingsParsers = {
+        allowpip: parseBool,
+        autoboard: parseBool,
+        autodouble: parseBool,
+        automove: parseBool,
+        away: parseBool,
+        bell: parseBool,
+        crawford: parseBool,
+        double: parseBool,
+        experience: parseInt,
+        greedy: parseBool,
+        moreboards: parseBool,
+        moves: parseBool,
+        notify: parseBool,
+        rating: parseFloat,
+        ratings: parseBool,
+        ready: parseBool,
+        redoubles: parseString,
+        report: parseBool,
+        silent: parseBool,
+        telnet: parseBool,
+        timezone: parseString,
+        wrap: parseBool,
+      };
+    },
+
     login: function (user, password) {
       if (this._socket) { throw "logout first"; }
       this._socket = new WebSocket("ws://localhost:62953/fibs"); // TODO
@@ -66,7 +96,7 @@
 
     //#region session
     _processSession: function (message) {
-      let parseTimestamp = s => new Date(parseInt(s)*1000);
+      let parseTimestamp = s => new Date(parseInt(s) * 1000);
 
       switch (message.cookie) {
         case "CLIP_WELCOME":
@@ -92,44 +122,27 @@
     //#region settings
     _processSettings: function (message) {
       switch (message.cookie) {
-        case "CLIP_OWN_INFO": this._onOwnInfo(message); break;
-        case "FIBS_AllowpipTrue": this._onSettingValue(message); break;
-        case "FIBS_AllowpipFalse": this._onSettingValue(message); break;
+        case "CLIP_OWN_INFO":
+          this._setCrumbSettings(message);
+          break;
+
+        case "FIBS_SettingsValue":
+        case "FIBS_SettingsToggle":
+          let m = { crumbs: {} };
+          m.crumbs[message.crumbs.name] = message.crumbs.value;
+          this._setCrumbSettings(m);
+          break;
       }
     },
 
-    _onOwnInfo: function (message) {
-      let parseBool = s => s == "1";
+    _setCrumbSettings: function (message) {
+      Object.keys(message.crumbs).filter(n => n != "name").forEach(name => {
+        let parse = this._settingsParsers[name];
+        let value = parse(message.crumbs[name]);
 
-      // NOTE: this.set seems to required for nested properties, e.g. obj.foo
-      this.set("settings.allowPip", parseBool(message.crumbs.allowPip));
-      //autoBoard: Boolean,
-      //autoDouble: Boolean,
-      //autoMove: Boolean,
-      //away: Boolean,
-      //bell: Boolean,
-      //crawford: Boolean,
-      //double: Boolean,
-      //experience: Number,
-      //greedy: Boolean,
-      //moreBoards: Boolean,
-      //moves: Boolean,
-      //notify: Boolean,
-      //rating: Number,
-      //ratings: Boolean,
-      //ready: Boolean,
-      //redoubles: String,
-      //report: Boolean,
-      //silent: Boolean,
-      //timezone: String,
-    },
-
-    _onSettingValue: function (message) {
-      switch (message.cookie) {
-        case "FIBS_AllowpipTrue": this.set("settings.allowPip", true); break;
-        case "FIBS_AllowpipFalse": this.set("settings.allowPip", false); break;
-        default: throw `unknown setting: ${message.cookie}`;
-      }
+        // NOTE: this.set() is required for nested properties, e.g. obj.foo
+        this.set(`settings.${name}`, value);
+      });
     },
     //#endregion
 

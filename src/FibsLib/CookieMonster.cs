@@ -76,6 +76,7 @@ namespace Fibs {
     class CookieDough {
       public FibsCookie Cookie;
       public Regex Regex;
+      public Dictionary<string, string> Extras { get; set; }
     };
 
     static CookieMessage MakeCookie(List<CookieDough> batch, string raw, States eatState) {
@@ -89,7 +90,17 @@ namespace Fibs {
             crumbs.Add(name, value);
 
             // only "message" values are allowed to be empty
-            Debug.Assert((name == "message") || value != "", $"{dough.Cookie}: missing crumb '{name}'");
+            Debug.Assert((name == "message") || !string.IsNullOrEmpty(value), $"{dough.Cookie}: missing crumb '{name}'");
+          }
+
+          // drop in hard-coded extra name-value pairs
+          if (dough.Extras != null) {
+            foreach (var pair in dough.Extras) {
+              crumbs.Add(pair.Key, pair.Value);
+
+              // only "message" values are allowed to be empty
+              Debug.Assert((pair.Key == "message") || !string.IsNullOrEmpty(pair.Value), $"{dough.Cookie}: missing crumb '{pair.Key}'");
+            }
           }
 
           return new CookieMessage(dough.Cookie, raw, crumbs.Count == 0 ? null : crumbs, eatState);
@@ -188,7 +199,7 @@ namespace Fibs {
     public static DateTime ParseTimestamp(string timestamp) =>
       new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc) + TimeSpan.FromSeconds(int.Parse(timestamp));
 
-    public static bool ParseBool(string s) => s == "1";
+    public static bool ParseBool(string s) => s == "1" || s == "YES";
 
     #region prepare batches
     // Initialize stuff, ready to start pumping out cookies by the thousands.
@@ -274,6 +285,7 @@ namespace Fibs {
       new CookieDough { Cookie = FibsCookie.FIBS_ScoreUpdate, Regex = new Regex("^score in (?<points>[0-9]+) point match:"), },
       new CookieDough { Cookie = FibsCookie.FIBS_MatchStart, Regex = new Regex("^Score is (?<score1>[0-9]+)-(?<score2>[0-9]+) in a (?<points>[0-9]+) point match\\."), },
       new CookieDough { Cookie = FibsCookie.FIBS_Settings, Regex = new Regex("^Settings of variables:"), },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsValue, Regex = new Regex("^(?<name>allowpip|autoboard|autodouble|automove|bell|crawford|double|moreboards|moves|greedy|notify|ratings|ready|report|silent|telnet|wrap) +(?<value>YES|NO)"), },
       new CookieDough { Cookie = FibsCookie.FIBS_Turn, Regex = new Regex("^turn:"), },
       new CookieDough { Cookie = FibsCookie.FIBS_Boardstyle, Regex = new Regex("^boardstyle:"), },
       new CookieDough { Cookie = FibsCookie.FIBS_Linelength, Regex = new Regex("^linelength:"), },
@@ -297,40 +309,6 @@ namespace Fibs {
       // NOTE: for FIBS_SavedMatchReady, see the Stars message, because it will appear to be one of those (has asterisk at index 0).
       new CookieDough { Cookie = FibsCookie.FIBS_PlayerIsWaitingForYou, Regex = new Regex("^[a-zA-Z_<>]+ is waiting for you to log in\\."), },
       new CookieDough { Cookie = FibsCookie.FIBS_IsAway, Regex = new Regex("^[a-zA-Z_<>]+ is away: "), },
-      new CookieDough { Cookie = FibsCookie.FIBS_AllowpipTrue, Regex = new Regex("^allowpip +YES"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_AllowpipFalse, Regex = new Regex("^allowpip +NO"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_AutoboardTrue, Regex = new Regex("^autoboard +YES"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_AutoboardFalse, Regex = new Regex("^autoboard +NO"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_AutodoubleTrue, Regex = new Regex("^autodouble +YES"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_AutodoubleFalse, Regex = new Regex("^autodouble +NO"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_AutomoveTrue, Regex = new Regex("^automove +YES"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_AutomoveFalse, Regex = new Regex("^automove +NO"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_BellTrue, Regex = new Regex("^bell +YES"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_BellFalse, Regex = new Regex("^bell +NO"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_CrawfordTrue, Regex = new Regex("^crawford +YES"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_CrawfordFalse, Regex = new Regex("^crawford +NO"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_DoubleTrue, Regex = new Regex("^double +YES"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_DoubleFalse, Regex = new Regex("^double +NO"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_MoreboardsTrue, Regex = new Regex("^moreboards +YES"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_MoreboardsFalse, Regex = new Regex("^moreboards +NO"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_MovesTrue, Regex = new Regex("^moves +YES"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_MovesFalse, Regex = new Regex("^moves +NO"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_GreedyTrue, Regex = new Regex("^greedy +YES"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_GreedyFalse, Regex = new Regex("^greedy +NO"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_NotifyTrue, Regex = new Regex("^notify +YES"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_NotifyFalse, Regex = new Regex("^notify +NO"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_RatingsTrue, Regex = new Regex("^ratings +YES"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_RatingsFalse, Regex = new Regex("^ratings +NO"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_ReadyTrue, Regex = new Regex("^ready +YES"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_ReadyFalse, Regex = new Regex("^ready +NO"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_ReportTrue, Regex = new Regex("^report +YES"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_ReportFalse, Regex = new Regex("^report +NO"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_SilentTrue, Regex = new Regex("^silent +YES"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_SilentFalse, Regex = new Regex("^silent +NO"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_TelnetTrue, Regex = new Regex("^telnet +YES"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_TelnetFalse, Regex = new Regex("^telnet +NO"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_WrapTrue, Regex = new Regex("^wrap +YES"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_WrapFalse, Regex = new Regex("^wrap +NO"), },
       new CookieDough { Cookie = FibsCookie.FIBS_Junk, Regex = new Regex("^Closed old connection with user"), },
       new CookieDough { Cookie = FibsCookie.FIBS_Done, Regex = new Regex("^Done\\."), },
       new CookieDough { Cookie = FibsCookie.FIBS_YourTurnToMove, Regex = new Regex("^It's your turn to move\\."), },
@@ -413,40 +391,40 @@ namespace Fibs {
       new CookieDough { Cookie = FibsCookie.FIBS_YouInvited, Regex = new Regex("^\\*\\* You invited"), },
       new CookieDough { Cookie = FibsCookie.FIBS_YourLastLogin, Regex = new Regex("^\\*\\* Last login:"), },
       new CookieDough { Cookie = FibsCookie.FIBS_NoOne, Regex = new Regex("^\\*\\* There is no one called (?<name>[a-zA-Z_<>]+)"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_AllowpipFalse, Regex = new Regex("^\\*\\* You don't allow the use of the server's 'pip' command\\."), },
-      new CookieDough { Cookie = FibsCookie.FIBS_AllowpipTrue, Regex = new Regex("^\\*\\* You allow the use the server's 'pip' command\\."), },
-      new CookieDough { Cookie = FibsCookie.FIBS_AutoboardFalse, Regex = new Regex("^\\*\\* The board won't be refreshed"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_AutoboardTrue, Regex = new Regex("^\\*\\* The board will be refreshed"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_AutodoubleTrue, Regex = new Regex("^\\*\\* You agree that doublets"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_AutodoubleFalse, Regex = new Regex("^\\*\\* You don't agree that doublets"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_AutomoveFalse, Regex = new Regex("^\\*\\* Forced moves won't"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_AutomoveTrue, Regex = new Regex("^\\*\\* Forced moves will"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_BellFalse, Regex = new Regex("^\\*\\* Your terminal won't ring"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_BellTrue, Regex = new Regex("^\\*\\* Your terminal will ring"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_CrawfordFalse, Regex = new Regex("^\\*\\* You would like to play without using the Crawford rule\\."), },
-      new CookieDough { Cookie = FibsCookie.FIBS_CrawfordTrue, Regex = new Regex("^\\*\\* You insist on playing with the Crawford rule\\."), },
-      new CookieDough { Cookie = FibsCookie.FIBS_DoubleFalse, Regex = new Regex("^\\*\\* You won't be asked if you want to double\\."), },
-      new CookieDough { Cookie = FibsCookie.FIBS_DoubleTrue, Regex = new Regex("^\\*\\* You will be asked if you want to double\\."), },
-      new CookieDough { Cookie = FibsCookie.FIBS_GreedyTrue, Regex = new Regex("^\\*\\* Will use automatic greedy bearoffs\\."), },
-      new CookieDough { Cookie = FibsCookie.FIBS_GreedyFalse, Regex = new Regex("^\\*\\* Won't use automatic greedy bearoffs\\."), },
-      new CookieDough { Cookie = FibsCookie.FIBS_MoreboardsTrue, Regex = new Regex("^\\*\\* Will send rawboards after rolling\\."), },
-      new CookieDough { Cookie = FibsCookie.FIBS_MoreboardsFalse, Regex = new Regex("^\\*\\* Won't send rawboards after rolling\\."), },
-      new CookieDough { Cookie = FibsCookie.FIBS_MovesTrue, Regex = new Regex("^\\*\\* You want a list of moves after this game\\."), },
-      new CookieDough { Cookie = FibsCookie.FIBS_MovesFalse, Regex = new Regex("^\\*\\* You won't see a list of moves after this game\\."), },
-      new CookieDough { Cookie = FibsCookie.FIBS_NotifyFalse, Regex = new Regex("^\\*\\* You won't be notified"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_NotifyTrue, Regex = new Regex("^\\*\\* You'll be notified"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_RatingsTrue, Regex = new Regex("^\\*\\* You'll see how the rating changes are calculated\\."), },
-      new CookieDough { Cookie = FibsCookie.FIBS_RatingsFalse, Regex = new Regex("^\\*\\* You won't see how the rating changes are calculated\\."), },
-      new CookieDough { Cookie = FibsCookie.FIBS_ReadyTrue, Regex = new Regex("^\\*\\* You're now ready to invite or join someone\\."), },
-      new CookieDough { Cookie = FibsCookie.FIBS_ReadyFalse, Regex = new Regex("^\\*\\* You're now refusing to play with someone\\."), },
-      new CookieDough { Cookie = FibsCookie.FIBS_ReportFalse, Regex = new Regex("^\\*\\* You won't be informed"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_ReportTrue, Regex = new Regex("^\\*\\* You will be informed"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_SilentTrue, Regex = new Regex("^\\*\\* You won't hear what other players shout\\."), },
-      new CookieDough { Cookie = FibsCookie.FIBS_SilentFalse, Regex = new Regex("^\\*\\* You will hear what other players shout\\."), },
-      new CookieDough { Cookie = FibsCookie.FIBS_TelnetFalse, Regex = new Regex("^\\*\\* You use a client program"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_TelnetTrue, Regex = new Regex("^\\*\\* You use telnet"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_WrapFalse, Regex = new Regex("^\\*\\* The server will wrap"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_WrapTrue, Regex = new Regex("^\\*\\* Your terminal knows how to wrap"), },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* You allow the use the server's 'pip' command\\."), Extras = new Dictionary<string, string> { ["name"] = "allowpip", ["value"] = "YES" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* You don't allow the use of the server's 'pip' command\\."), Extras = new Dictionary<string, string> { ["name"] = "allowpip", ["value"] = "NO" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* The board will be refreshed"), Extras = new Dictionary<string, string> { ["name"] = "autoboard", ["value"] = "YES" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* The board won't be refreshed"), Extras = new Dictionary<string, string> { ["name"] = "autoboard", ["value"] = "NO" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* You agree that doublets"), Extras = new Dictionary<string, string> { ["name"] = "autodouble", ["value"] = "YES" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* You don't agree that doublets"), Extras = new Dictionary<string, string> { ["name"] = "autodouble", ["value"] = "NO" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* Forced moves will"), Extras = new Dictionary<string, string> { ["name"] = "automove", ["value"] = "YES" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* Forced moves won't"), Extras = new Dictionary<string, string> { ["name"] = "automove", ["value"] = "NO" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* Your terminal will ring"), Extras = new Dictionary<string, string> { ["name"] = "bell", ["value"] = "YES" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* Your terminal won't ring"), Extras = new Dictionary<string, string> { ["name"] = "bell", ["value"] = "NO" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* You insist on playing with the Crawford rule\\."), Extras = new Dictionary<string, string> { ["name"] = "crawford", ["value"] = "YES" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* You would like to play without using the Crawford rule\\."), Extras = new Dictionary<string, string> { ["name"] = "crawford", ["value"] = "NO" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* You will be asked if you want to double\\."), Extras = new Dictionary<string, string> { ["name"] = "double", ["value"] = "YES" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* You won't be asked if you want to double\\."), Extras = new Dictionary<string, string> { ["name"] = "double", ["value"] = "NO" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* Will use automatic greedy bearoffs\\."), Extras = new Dictionary<string, string> { ["name"] = "greedy", ["value"] = "YES" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* Won't use automatic greedy bearoffs\\."), Extras = new Dictionary<string, string> { ["name"] = "greedy", ["value"] = "NO" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* Will send rawboards after rolling\\."), Extras = new Dictionary<string, string> { ["name"] = "moreboards", ["value"] = "YES" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* Won't send rawboards after rolling\\."), Extras = new Dictionary<string, string> { ["name"] = "moreboards", ["value"] = "NO" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* You want a list of moves after this game\\."), Extras = new Dictionary<string, string> { ["name"] = "moves", ["value"] = "YES" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* You won't see a list of moves after this game\\."), Extras = new Dictionary<string, string> { ["name"] = "moves", ["value"] = "NO" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* You'll be notified"), Extras = new Dictionary<string, string> { ["name"] = "notify", ["value"] = "YES" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* You won't be notified"), Extras = new Dictionary<string, string> { ["name"] = "notify", ["value"] = "NO" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* You'll see how the rating changes are calculated\\."), Extras = new Dictionary<string, string> { ["name"] = "ratings", ["value"] = "YES" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* You won't see how the rating changes are calculated\\."), Extras = new Dictionary<string, string> { ["name"] = "ratings", ["value"] = "NO" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* You're now ready to invite or join someone\\."), Extras = new Dictionary<string, string> { ["name"] = "ready", ["value"] = "YES" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* You're now refusing to play with someone\\."), Extras = new Dictionary<string, string> { ["name"] = "ready", ["value"] = "NO" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* You will be informed"), Extras = new Dictionary<string, string> { ["name"] = "report", ["value"] = "YES" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* You won't be informed"), Extras = new Dictionary<string, string> { ["name"] = "report", ["value"] = "NO" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* You will hear what other players shout\\."), Extras = new Dictionary<string, string> { ["name"] = "silent", ["value"] = "YES" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* You won't hear what other players shout\\."), Extras = new Dictionary<string, string> { ["name"] = "silent", ["value"] = "NO" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* You use telnet"), Extras = new Dictionary<string, string> { ["name"] = "telnet", ["value"] = "YES" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* You use a client program"), Extras = new Dictionary<string, string> { ["name"] = "telnet", ["value"] = "NO" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* The server will wrap"), Extras = new Dictionary<string, string> { ["name"] = "wrap", ["value"] = "YES" } },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsToggle, Regex = new Regex("^\\*\\* Your terminal knows how to wrap"), Extras = new Dictionary<string, string> { ["name"] = "wrap", ["value"] = "NO" } },
       new CookieDough { Cookie = FibsCookie.FIBS_PlayerRefusingGames, Regex = new Regex("^\\*\\* [a-zA-Z_<>]+ is refusing games\\."), },
       new CookieDough { Cookie = FibsCookie.FIBS_NotWatching, Regex = new Regex("^\\*\\* You're not watching\\."), },
       new CookieDough { Cookie = FibsCookie.FIBS_NotWatchingPlaying, Regex = new Regex("^\\*\\* You're not watching or playing\\."), },
@@ -487,7 +465,7 @@ namespace Fibs {
       new CookieDough { Cookie = FibsCookie.FIBS_LoginPrompt, Regex = new Regex("^login:") },
       new CookieDough { Cookie = FibsCookie.FIBS_WARNINGAlreadyLoggedIn, Regex = new Regex("^\\*\\* Warning: You are already logged in\\.") },
       new CookieDough { Cookie = FibsCookie.CLIP_WELCOME, Regex = new Regex("^1 (?<name>[a-zA-Z_<>]+) (?<lastLogin>[0-9]+) (?<lastHost>.*)") },
-      new CookieDough { Cookie = FibsCookie.CLIP_OWN_INFO, Regex = new Regex("^2 (?<name>[a-zA-Z_<>]+) (?<allowPip>[01]) (?<autoBoard>[01]) (?<autoDouble>[01]) (?<autoMove>[01]) (?<away>[01]) (?<bell>[01]) (?<crawford>[01]) (?<double>[01]) (?<experience>[0-9]+) (?<greedy>[01]) (?<moreBoards>[01]) (?<moves>[01]) (?<notify>[01]) (?<rating>[0-9]+\\.[0-9]+) (?<ratings>[01]) (?<ready>[01]) (?<redoubles>[0-9a-zA-Z]+) (?<report>[01]) (?<silent>[01]) (?<timezone>.*)") },
+      new CookieDough { Cookie = FibsCookie.CLIP_OWN_INFO, Regex = new Regex("^2 (?<name>[a-zA-Z_<>]+) (?<allowpip>[01]) (?<autoboard>[01]) (?<autodouble>[01]) (?<automove>[01]) (?<away>[01]) (?<bell>[01]) (?<crawford>[01]) (?<double>[01]) (?<experience>[0-9]+) (?<greedy>[01]) (?<moreboards>[01]) (?<moves>[01]) (?<notify>[01]) (?<rating>[0-9]+\\.[0-9]+) (?<ratings>[01]) (?<ready>[01]) (?<redoubles>[0-9a-zA-Z]+) (?<report>[01]) (?<silent>[01]) (?<timezone>.*)") },
       new CookieDough { Cookie = FibsCookie.CLIP_MOTD_BEGIN, Regex = new Regex("^3$") },
       new CookieDough { Cookie = FibsCookie.FIBS_FailedLogin, Regex = new Regex("^> [0-9]+") },  // bogus CLIP messages sent after a failed login
       new CookieDough { Cookie = FibsCookie.FIBS_PreLogin, Regex = CatchAllIntoMessageRegex },  // catch all
@@ -695,40 +673,8 @@ namespace Fibs {
     FIBS_Sortwho,
     FIBS_Timezone,
     FIBS_RedoublesSetTo,
-    FIBS_AllowpipTrue,
-    FIBS_AllowpipFalse,
-    FIBS_AutoboardTrue,
-    FIBS_AutoboardFalse,
-    FIBS_AutodoubleTrue,
-    FIBS_AutodoubleFalse,
-    FIBS_AutomoveTrue,
-    FIBS_AutomoveFalse,
-    FIBS_BellTrue,
-    FIBS_BellFalse,
-    FIBS_CrawfordTrue,
-    FIBS_CrawfordFalse,
-    FIBS_DoubleTrue,
-    FIBS_DoubleFalse,
-    FIBS_MoreboardsTrue,
-    FIBS_MoreboardsFalse,
-    FIBS_MovesTrue,
-    FIBS_MovesFalse,
-    FIBS_GreedyTrue,
-    FIBS_GreedyFalse,
-    FIBS_NotifyTrue,
-    FIBS_NotifyFalse,
-    FIBS_RatingsTrue,
-    FIBS_RatingsFalse,
-    FIBS_ReadyTrue,
-    FIBS_ReadyFalse,
-    FIBS_ReportTrue,
-    FIBS_ReportFalse,
-    FIBS_SilentTrue,
-    FIBS_SilentFalse,
-    FIBS_TelnetTrue,
-    FIBS_TelnetFalse,
-    FIBS_WrapTrue,
-    FIBS_WrapFalse,
+    FIBS_SettingsValue, // csells
+    FIBS_SettingsToggle, // csells
     FIBS_RunningDiceTest, // csells
   }
   #endregion
