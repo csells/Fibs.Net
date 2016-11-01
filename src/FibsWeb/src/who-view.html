@@ -1,0 +1,96 @@
+﻿<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+
+<dom-module id="who-view">
+  <template>
+    <paper-input label="Filter by name" value="{{filter}}"></paper-input>
+    <paper-checkbox checked="{{available}}">available</paper-checkbox>
+    <paper-checkbox checked="{{human}}">human</paper-checkbox>
+    <paper-checkbox checked="{{robot}}">robot</paper-checkbox>
+    <table>
+      <tr>
+        <th>name</th>
+        <th>opponent</th>
+        <!--<th>watching</th>-->
+        <th>ready</th>
+        <!--<th>away</th>-->
+        <th>rating</th>
+        <th>experience</th>
+        <!--<th>idle</th>
+        <th>login</th>
+        <th>hostName</th>
+        <th>client</th>
+        <th>email</th>-->
+      </tr>
+      <template is="dom-repeat" items="[[who]]" filter="[[_getFilter(filter, available, human, robot)]]" sort="_sort" observe="name">
+        <tr>
+          <td>[[item.name]]</td>
+          <td>[[item.opponent]]</td>
+          <!--<td>[[item.watching]]</td>-->
+          <td>[[item.ready]]</td>
+          <!--<td>[[item.away]]</td>-->
+          <td>[[item.rating]]</td>
+          <td>[[item.experience]]</td>
+          <!--<td>[[item.idle]]</td>
+          <td>[[item.login]]</td>
+          <td>[[item.hostName]]</td>
+          <td>[[item.client]]</td>
+          <td>[[item.email]]</td>-->
+        </tr>
+      </template>
+    </table>
+  </template>
+
+  <script>
+    Polymer({
+      is: "who-view",
+
+      properties: {
+        who: Array,
+        filter: String,
+        available: {
+          type: Boolean,
+          value: true,
+        },
+        human: {
+          type: Boolean,
+          value: true,
+        },
+        robot: {
+          type: Boolean,
+          value: true,
+        },
+      },
+
+      _getFilter: function (filter, available, human, robot) {
+        return function (person) {
+          // if the name doesn't match the filter, we're done
+          if (!person.name.toLowerCase().includes(filter.toLowerCase())) { return false; }
+
+          // if they're required to be available and they're not, we're done
+          let personIsAvailable = person.ready && !person.away && person.opponent == null;
+          if (available && !personIsAvailable) { return false; }
+
+          // check if the person is a robot (TODO: something better here)
+          let personIsRobot = person.name.toLowerCase().includes("bot");
+
+          // if we're not including humans and they're a human, we're done
+          if (!human && !personIsRobot) { return false; }
+
+          // if we're not including robots and they're a robot, we're done
+          if (!robot && personIsRobot) { return false; }
+
+          return true;
+        };
+      },
+
+      _sort: function (a, b) {
+        // case-insensitive compare
+        return a.name.localeCompare(b.name, "en", { sensitivity: "base" });
+      }
+
+    });
+
+  </script>
+</dom-module>

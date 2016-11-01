@@ -11,10 +11,11 @@
 <link rel="import" href="fibs-client.html" />
 <link rel="import" href="login-view.html" />
 <link rel="import" href="settings-view.html" />
+<link rel="import" href="who-view.html" />
 
 <dom-module id="fibs-app">
   <template>
-    <fibs-client id="fibs-client" session="{{session}}" settings="{{settings}}"></fibs-client>
+    <fibs-client id="fibs-client" session="{{session}}" settings="{{settings}}" who="{{who}}"></fibs-client>
     <app-drawer-layout fullbleed>
       <!-- Drawer content -->
       <app-drawer>
@@ -22,6 +23,7 @@
         <iron-selector selected="{{view}}" attr-for-selected="name" role="navigation">
           <p name="login">Login</p>
           <p name="settings">Settings</p>
+          <p name="who">Who</p>
         </iron-selector>
       </app-drawer>
       <!-- Main content -->
@@ -35,6 +37,7 @@
         <iron-pages selected="[[view]]" attr-for-selected="name" fallback-selection="login" role="main">
           <login-view name="login" session="[[session]]"></login-view>
           <settings-view name="settings" settings="[[settings]]"></settings-view>
+          <who-view name="who" who="[[who]]"></who-view>
         </iron-pages>
       </app-header-layout>
     </app-drawer-layout>

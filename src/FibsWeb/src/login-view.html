@@ -12,8 +12,8 @@
       <div>last host: [[session.lastHost]]</div>
     </form>
     <h1>Message of the Day</h1>
-    <template is="dom-repeat" items="[[session.motd]]" as="line">
-      <p>{{line}}</p>
+    <template is="dom-repeat" items="[[session.motd]]">
+      <p>{{item}}</p>
     </template>
   </template>
 

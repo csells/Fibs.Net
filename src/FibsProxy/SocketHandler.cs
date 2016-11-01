@@ -53,6 +53,7 @@ namespace FibsProxy {
         // TODO: support creating new users
         // TODO: support other servers besides fibs.com
         // TODO: support message queueing while there awaiting a response, otherwise FIBS drops requests
+        // (and remember to take the hack out of the client...)
         var user = match.Groups["user"].Value;
         var password = match.Groups["password"].Value;
         Task<CookieMessage[]> fibsReadTask = fibs.Login(user, password);

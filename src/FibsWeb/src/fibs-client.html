@@ -18,7 +18,13 @@
       settings: {
         type: Object,
         notify: true,
-        value: function () { return {}; }
+        value: function () { return {}; },
+      },
+
+      who: {
+        type: Array,
+        notify: true,
+        value: function () { return []; },
       },
 
       redoublesValues: {
@@ -208,6 +214,32 @@
 
     //#region who
     _processWho: function (message) {
+      switch (message.cookie) {
+        case "CLIP_WHO_INFO":
+          let parseString = s => s == "-" ? null : s;
+          let parseBool = s => s == "1";
+          let crumbs = message.crumbs;
+          let person = {
+            name: crumbs.name,
+            opponent: parseString(crumbs.opponent),
+            watching: parseString(crumbs.watching),
+            ready: parseBool(crumbs.ready),
+            away: parseBool(crumbs.away),
+            rating: parseFloat(crumbs.rating),
+            experience: parseInt(crumbs.experience),
+            idle: parseInt(crumbs.experience),
+            login: crumbs.login,
+            hostName: crumbs.hostName,
+            client: crumbs.client,
+            email: crumbs.email,
+          };
+
+          console.log(`who: ${person.name}`);
+          let i = this.who.findIndex(w=>w.name == person.name);
+          if (i == -1) { this.push("who", person); }
+          else { this.splice("who", i, 1, person); }
+          break;
+      }
     },
     //#endregion
 
