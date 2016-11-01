@@ -449,6 +449,7 @@ namespace FibsTest {
       }
     }
 
+    [Fact]
     public void FIBS_RedoublesChangeToNone() {
       var monster = CreateLoggedInCookieMonster();
       var s = "Value of 'redoubles' set to 'none'.";
@@ -467,6 +468,7 @@ namespace FibsTest {
       Assert.Equal(42, int.Parse(cm.Crumbs["value"]));
     }
 
+    [Fact]
     public void FIBS_RedoublesChangeToUnlimited() {
       var monster = CreateLoggedInCookieMonster();
       var s = "Value of 'redoubles' set to 'unlimited'.";
@@ -483,6 +485,36 @@ namespace FibsTest {
       Assert.Equal(FibsCookie.FIBS_SettingsChange, cm.Cookie);
       Assert.Equal("timezone", cm.Crumbs["name"]);
       Assert.Equal("America/Los_Angeles", cm.Crumbs["value"]);
+    }
+
+    [Fact]
+    public void FIBS_Board() {
+      // from http://www.fibs.com/fibs_interface.html#board_state
+      var monster = CreateLoggedInCookieMonster();
+      var s = "board:You:someplayer:3:0:1:0:-2:0:0:0:0:5:0:3:0:0:0:-5:5:0:0:0:-3:0:-5:0:0:0:0:2:0:1:6:2:0:0:1:1:1:0:1:-1:0:25:0:0:0:0:2:0:0:0";
+      var cm = monster.EatCookie(s);
+      Assert.Equal(FibsCookie.FIBS_Board, cm.Cookie);
+      Assert.Equal("You", cm.Crumbs["player1"]);
+      Assert.Equal("someplayer", cm.Crumbs["player2"]);
+      Assert.Equal(3, int.Parse(cm.Crumbs["matchLength"]));
+      Assert.Equal(0, int.Parse(cm.Crumbs["player1Score"]));
+      Assert.Equal(1, int.Parse(cm.Crumbs["player2Score"]));
+      Assert.Equal("0:-2:0:0:0:0:5:0:3:0:0:0:-5:5:0:0:0:-3:0:-5:0:0:0:0:2:0", cm.Crumbs["board"]);
+      Assert.Equal("O", CookieMonster.ParseBoardTurn(cm.Crumbs["turn"]));
+      Assert.Equal("6:2", cm.Crumbs["player1Dice"]);
+      Assert.Equal("0:0", cm.Crumbs["player2Dice"]);
+      Assert.Equal(1, int.Parse(cm.Crumbs["doublingCube"]));
+      Assert.True(CookieMonster.ParseBool(cm.Crumbs["player1MayDouble"]));
+      Assert.True(CookieMonster.ParseBool(cm.Crumbs["player2MayDouble"]));
+      Assert.False(CookieMonster.ParseBool(cm.Crumbs["wasDoubled"]));
+      Assert.Equal("O", CookieMonster.ParseBoardColor(cm.Crumbs["color"]));
+      Assert.Equal(-1, int.Parse(cm.Crumbs["direction"]));
+      Assert.Equal(0, int.Parse(cm.Crumbs["player1Home"]));
+      Assert.Equal(0, int.Parse(cm.Crumbs["player2Home"]));
+      Assert.Equal(0, int.Parse(cm.Crumbs["player1Bar"]));
+      Assert.Equal(0, int.Parse(cm.Crumbs["player2Bar"]));
+      Assert.Equal(2, int.Parse(cm.Crumbs["canMove"]));
+      Assert.Equal(0, int.Parse(cm.Crumbs["redoubles"]));
     }
 
   }

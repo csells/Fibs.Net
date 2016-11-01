@@ -6,6 +6,7 @@
   <template>
     <paper-input label="Filter by name" value="{{filter}}"></paper-input>
     <paper-checkbox checked="{{available}}">available</paper-checkbox>
+    <paper-checkbox checked="{{playing}}">playing</paper-checkbox>
     <paper-checkbox checked="{{human}}">human</paper-checkbox>
     <paper-checkbox checked="{{robot}}">robot</paper-checkbox>
     <table>
@@ -22,8 +23,9 @@
         <th>hostName</th>
         <th>client</th>
         <th>email</th>-->
+        <th>action</th>
       </tr>
-      <template is="dom-repeat" items="[[who]]" filter="[[_getFilter(filter, available, human, robot)]]" sort="_sort" observe="name">
+      <template is="dom-repeat" items="[[who]]" filter="[[_getFilter(filter, available, playing, human, robot)]]" sort="_sort" observe="name">
         <tr>
           <td>[[item.name]]</td>
           <td>[[item.opponent]]</td>
@@ -37,6 +39,7 @@
           <td>[[item.hostName]]</td>
           <td>[[item.client]]</td>
           <td>[[item.email]]</td>-->
+          <td><button data-opponent="[[item.opponent]]" on-tap="_watch" disabled="[[_watchDisabled(item.opponent)]]">Watch</button></td>
         </tr>
       </template>
     </table>
@@ -53,6 +56,7 @@
           type: Boolean,
           value: true,
         },
+        playing: Boolean,
         human: {
           type: Boolean,
           value: true,
@@ -63,7 +67,11 @@
         },
       },
 
-      _getFilter: function (filter, available, human, robot) {
+      ready: function () {
+        this._client = window.getService("fibs-client");
+      },
+
+      _getFilter: function (filter, available, playing, human, robot) {
         return function (person) {
           // if the name doesn't match the filter, we're done
           if (!person.name.toLowerCase().includes(filter.toLowerCase())) { return false; }
@@ -71,6 +79,9 @@
           // if they're required to be available and they're not, we're done
           let personIsAvailable = person.ready && !person.away && person.opponent == null;
           if (available && !personIsAvailable) { return false; }
+
+          // if they're required to be playing and they're not, we're done
+          if (playing && person.opponent == null) { return false; }
 
           // check if the person is a robot (TODO: something better here)
           let personIsRobot = person.name.toLowerCase().includes("bot");
@@ -88,7 +99,15 @@
       _sort: function (a, b) {
         // case-insensitive compare
         return a.name.localeCompare(b.name, "en", { sensitivity: "base" });
-      }
+      },
+
+      _watch: function (e) {
+        this._client.watch(e.target.dataOpponent);
+      },
+
+      _watchDisabled: function (opponent) {
+        return !opponent;
+      },
 
     });
 

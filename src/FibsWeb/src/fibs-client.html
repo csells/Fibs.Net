@@ -27,6 +27,12 @@
         value: function () { return []; },
       },
 
+      watching: {
+        type: Array,
+        notify: true,
+        value: function () { return {}; },
+      },
+
       redoublesValues: {
         type: Array,
         value: function () { return this._getValidRedoublesValues(); },
@@ -69,7 +75,7 @@
         wrap: parseBool,
       };
 
-      // request queuing goo
+      // request queueing goo
       this._awaitingResponse = false;
       this._queue = []
     },
@@ -92,6 +98,7 @@
           this._processSession(message);
           this._processSettings(message);
           this._processWho(message);
+          this._processWatch(message);
         });
 
         this._checksend();
@@ -110,28 +117,10 @@
       };
     },
 
+    //#region session
     logout: function () {
       console.log("logout");
       this._send("bye");
-    },
-
-    toggleSetting: function (name) {
-      this._send(`toggle ${name}`);
-    },
-
-    setAway: function (message) {
-      if (message) { this._send(`away ${message}`); }
-      else { this._send("back"); }
-    },
-
-    setRedoubles: function (value) {
-      // the valid redoubles setting values are 0-99 or unlimited,
-      // but the set redoubles command value arguments are none, 1-99 or unlimited
-      this._send(`set redoubles ${value == "0" ? "none" : value}`);
-    },
-
-    setTimezone: function (value) {
-      this._send(`set timezone ${value}`);
     },
 
     _send: function (s) {
@@ -149,7 +138,6 @@
       this._socket.send(s);
     },
 
-    //#region session
     _processSession: function (message) {
       let parseTimestamp = s => new Date(parseInt(s) * 1000);
 
@@ -175,6 +163,29 @@
     //#endregion
 
     //#region settings
+    toggleSetting: function (name) {
+      this._send(`toggle ${name}`);
+    },
+
+    setAway: function (message) {
+      if (message) { this._send(`away ${message}`); }
+      else { this._send("back"); }
+    },
+
+    setRedoubles: function (value) {
+      // the valid redoubles setting values are 0-99 or unlimited,
+      // but the set redoubles command value arguments are none, 1-99 or unlimited
+      this._send(`set redoubles ${value == "0" ? "none" : value}`);
+    },
+
+    setTimezone: function (value) {
+      this._send(`set timezone ${value}`);
+    },
+
+    setBoardstyle: function (value) {
+      this._send("set boardstyle 3");
+    },
+
     _processSettings: function (message) {
       switch (message.cookie) {
         case "CLIP_OWN_INFO":
@@ -209,6 +220,7 @@
       if (!this.settings.moreboards) { this.toggleSetting("moreboards"); }
       if (!this.settings.notify) { this.toggleSetting("notify"); }
       if (!this.settings.report) { this.toggleSetting("report"); }
+      this.setBoardstyle(3);
     },
     //#endregion
 
@@ -216,13 +228,13 @@
     _processWho: function (message) {
       switch (message.cookie) {
         case "CLIP_WHO_INFO":
-          let parseString = s => s == "-" ? null : s;
+          let parseOptional = s => s == "-" ? null : s;
           let parseBool = s => s == "1";
           let crumbs = message.crumbs;
           let person = {
             name: crumbs.name,
-            opponent: parseString(crumbs.opponent),
-            watching: parseString(crumbs.watching),
+            opponent: parseOptional(crumbs.opponent),
+            watching: parseOptional(crumbs.watching),
             ready: parseBool(crumbs.ready),
             away: parseBool(crumbs.away),
             rating: parseFloat(crumbs.rating),
@@ -230,14 +242,30 @@
             idle: parseInt(crumbs.experience),
             login: crumbs.login,
             hostName: crumbs.hostName,
-            client: crumbs.client,
-            email: crumbs.email,
+            client: parseOptional(crumbs.client),
+            email: parseOptional(crumbs.email),
           };
 
-          console.log(`who: ${person.name}`);
+          //console.log(`who: ${person.name}`);
           let i = this.who.findIndex(w=>w.name == person.name);
           if (i == -1) { this.push("who", person); }
           else { this.splice("who", i, 1, person); }
+          break;
+      }
+    },
+    //#endregion
+
+    //#region watch
+    watch: function (name) {
+      if (name) { this._send(`watch ${name}`); }
+      else { this._send("unwatch"); }
+    },
+
+    _processWatch: function (message) {
+      switch (message.cookie) {
+        case "FIBS_Board":
+          //console.log("board: " + message.crumbs);
+          this.watching = message.crumbs;
           break;
       }
     },
