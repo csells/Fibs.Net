@@ -20,7 +20,7 @@
 
   `telnet fibs.com:4321`
 
-* If you don't have a telnet client (and Windows doesn't seem to ship with one anymore), I recommend [puttytel](http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html). Once you have it downloaded, you can log into FIBS with the following:
+  If you don't have a telnet client (and Windows doesn't seem to ship with one anymore), I recommend [puttytel](http://www.chiark.greenend.org.uk/~sgtatham/putty/download.html). Once you have it downloaded, you can log into FIBS with the following:
 
   `puttytel telnet://fibs.com:4321`
 
