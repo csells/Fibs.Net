@@ -82,7 +82,7 @@
 
     login: function (user, password) {
       if (this._socket) { throw "logout first"; }
-      this._socket = new WebSocket("ws://localhost:62953/fibs"); // TODO
+      this._socket = new WebSocket("ws://localhost:5000/fibs"); // TODO
 
       this._socket.onopen = e => {
         console.log("socket: logging in as " + user);
