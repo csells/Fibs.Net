@@ -1,0 +1,272 @@
+<!-- built with the wonderful REPL-ness of SVG-Pad: http://somnid.github.io/svg-pad/ -->
+<!-- dimensions based on tournament standard board: 21" x 26" -->
+<!-- expressed as the main board: 210 x 260 * 2 plus + the cave (where the "bearing" off pieces go...) -->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="574" height="420">
+
+  <!-- frame -->
+  <rect x="0" y="0" height="420" width="574" fill="white" stroke="black" stroke-width="5" />
+
+  <!-- outer board -->
+  <rect x="20" y="20" height="380" width="216" fill="darkgreen" stroke="black" />
+
+  <!-- inner board -->
+  <rect x="284" y="20" height="380" width="216" fill="darkgreen" stroke="black" />
+
+  <!-- pips: top-left -->
+  <polygon points="20,20 38,170 54,20" fill="gainsboro" stroke="black" />
+  <polygon points="56,20 74,170 90,20" fill="grey" stroke="black" />
+  <polygon points="92,20 110,170 126,20" fill="gainsboro" stroke="black" />
+  <polygon points="128,20 146,170 162,20" fill="grey" stroke="black" />
+  <polygon points="164,20 182,170 200,20" fill="gainsboro" stroke="black" />
+  <polygon points="202,20 220,170 236,20" fill="grey" stroke="black" />
+
+  <!-- pips: top-right -->
+  <polygon points="284,20 302,170 318,20" fill="gainsboro" stroke="black" />
+  <polygon points="320,20 338,170 354,20" fill="grey" stroke="black" />
+  <polygon points="356,20 374,170 390,20" fill="gainsboro" stroke="black" />
+  <polygon points="392,20 410,170 426,20" fill="grey" stroke="black" />
+  <polygon points="428,20 446,170 462,20" fill="gainsboro" stroke="black" />
+  <polygon points="464,20 482,170 498,20" fill="grey" stroke="black" />
+
+  <!-- pips: bottom-left -->
+  <polygon points="20,400 38,250 54,400" fill="grey" stroke="black" />
+  <polygon points="56,400 74,250 90,400" fill="gainsboro" stroke="black" />
+  <polygon points="92,400 110,250 126,400" fill="grey" stroke="black" />
+  <polygon points="128,400 146,250 162,400" fill="gainsboro" stroke="black" />
+  <polygon points="164,400 182,250 200,400" fill="grey" stroke="black" />
+  <polygon points="202,400 220,250 236,400" fill="gainsboro" stroke="black" />
+
+  <!-- pips: bottom-right -->
+  <polygon points="284,400 302,250 318,400" fill="grey" stroke="black" />
+  <polygon points="320,400 338,250 354,400" fill="gainsboro" stroke="black" />
+  <polygon points="356,400 374,250 390,400" fill="grey" stroke="black" />
+  <polygon points="392,400 410,250 426,400" fill="gainsboro" stroke="black" />
+  <polygon points="428,400 446,250 462,400" fill="grey" stroke="black" />
+  <polygon points="464,400 482,250 498,400" fill="gainsboro" stroke="black" />
+
+  <!-- text: top-left -->
+  <text x="38" y="17" font-family="arial" text-anchor="middle">13</text>
+  <text x="74" y="17" font-family="arial" text-anchor="middle">14</text>
+  <text x="110" y="17" font-family="arial" text-anchor="middle">15</text>
+  <text x="146" y="17" font-family="arial" text-anchor="middle">16</text>
+  <text x="182" y="17" font-family="arial" text-anchor="middle">17</text>
+  <text x="218" y="17" font-family="arial" text-anchor="middle">18</text>
+
+  <!-- text: top-right -->
+  <text x="302" y="17" font-family="arial" text-anchor="middle">19</text>
+  <text x="338" y="17" font-family="arial" text-anchor="middle">20</text>
+  <text x="374" y="17" font-family="arial" text-anchor="middle">21</text>
+  <text x="410" y="17" font-family="arial" text-anchor="middle">22</text>
+  <text x="446" y="17" font-family="arial" text-anchor="middle">23</text>
+  <text x="482" y="17" font-family="arial" text-anchor="middle">24</text>
+
+  <!-- text: bottom-left -->
+  <text x="38" y="414" font-family="arial" text-anchor="middle">12</text>
+  <text x="74" y="414" font-family="arial" text-anchor="middle">11</text>
+  <text x="110" y="414" font-family="arial" text-anchor="middle">10</text>
+  <text x="146" y="414" font-family="arial" text-anchor="middle">9</text>
+  <text x="182" y="414" font-family="arial" text-anchor="middle">8</text>
+  <text x="218" y="414" font-family="arial" text-anchor="middle">7</text>
+
+  <!-- text: bottom-right -->
+  <text x="302" y="414" font-family="arial" text-anchor="middle">6</text>
+  <text x="338" y="414" font-family="arial" text-anchor="middle">5</text>
+  <text x="374" y="414" font-family="arial" text-anchor="middle">4</text>
+  <text x="410" y="414" font-family="arial" text-anchor="middle">3</text>
+  <text x="446" y="414" font-family="arial" text-anchor="middle">2</text>
+  <text x="482" y="414" font-family="arial" text-anchor="middle">1</text>
+
+  <!-- player1 cave -->
+  <rect x="520" y="220" height="180" width="32" fill="darkgreen" stroke="black" stroke-width="2" />
+
+  <!-- player2 cave -->
+  <rect x="520" y="20" height="180" width="32" fill="darkgreen" stroke="black" stroke-width="2" />
+
+  <!-- EXAMPLE PIECES -->
+  <!-- cave pieces: player 1, pieces 1-15 -->
+  <rect x="522" y="387" height="11" width="28" fill="black" stroke="grey" stroke-width="2" />
+  <rect x="522" y="376" height="11" width="28" fill="black" stroke="grey" stroke-width="2" />
+  <rect x="522" y="365" height="11" width="28" fill="black" stroke="grey" stroke-width="2" />
+  <rect x="522" y="354" height="11" width="28" fill="black" stroke="grey" stroke-width="2" />
+  <rect x="522" y="343" height="11" width="28" fill="black" stroke="grey" stroke-width="2" />
+  <rect x="522" y="332" height="11" width="28" fill="black" stroke="grey" stroke-width="2" />
+  <rect x="522" y="321" height="11" width="28" fill="black" stroke="grey" stroke-width="2" />
+  <rect x="522" y="310" height="11" width="28" fill="black" stroke="grey" stroke-width="2" />
+  <rect x="522" y="299" height="11" width="28" fill="black" stroke="grey" stroke-width="2" />
+  <rect x="522" y="288" height="11" width="28" fill="black" stroke="grey" stroke-width="2" />
+  <rect x="522" y="277" height="11" width="28" fill="black" stroke="grey" stroke-width="2" />
+  <rect x="522" y="266" height="11" width="28" fill="black" stroke="grey" stroke-width="2" />
+  <rect x="522" y="255" height="11" width="28" fill="black" stroke="grey" stroke-width="2" />
+  <rect x="522" y="244" height="11" width="28" fill="black" stroke="grey" stroke-width="2" />
+  <rect x="522" y="233" height="11" width="28" fill="black" stroke="grey" stroke-width="2" />
+
+  <!-- cave pieces: player 2 -->
+  <rect x="522" y="22" height="11" width="28" fill="white" stroke="grey" stroke-width="2" />
+  <rect x="522" y="33" height="11" width="28" fill="white" stroke="grey" stroke-width="2" />
+  <rect x="522" y="44" height="11" width="28" fill="white" stroke="grey" stroke-width="2" />
+  <rect x="522" y="55" height="11" width="28" fill="white" stroke="grey" stroke-width="2" />
+  <rect x="522" y="66" height="11" width="28" fill="white" stroke="grey" stroke-width="2" />
+  <rect x="522" y="77" height="11" width="28" fill="white" stroke="grey" stroke-width="2" />
+  <rect x="522" y="88" height="11" width="28" fill="white" stroke="grey" stroke-width="2" />
+  <rect x="522" y="99" height="11" width="28" fill="white" stroke="grey" stroke-width="2" />
+  <rect x="522" y="110" height="11" width="28" fill="white" stroke="grey" stroke-width="2" />
+  <rect x="522" y="121" height="11" width="28" fill="white" stroke="grey" stroke-width="2" />
+  <rect x="522" y="132" height="11" width="28" fill="white" stroke="grey" stroke-width="2" />
+  <rect x="522" y="143" height="11" width="28" fill="white" stroke="grey" stroke-width="2" />
+  <rect x="522" y="154" height="11" width="28" fill="white" stroke="grey" stroke-width="2" />
+  <rect x="522" y="165" height="11" width="28" fill="white" stroke="grey" stroke-width="2" />
+  <rect x="522" y="176" height="11" width="28" fill="white" stroke="grey" stroke-width="2" />
+
+  <!-- pieces: 13-1 - 13-5 -->
+  <circle cx="37" cy="35" r="14" fill="black" stroke="black" stroke-width="2px" />
+  <circle cx="37" cy="64" r="14" fill="white" stroke="black" stroke-width="2px" />
+  <circle cx="37" cy="93" r="14" fill="black" stroke="black" stroke-width="2px" />
+  <circle cx="37" cy="122" r="14" fill="white" stroke="black" stroke-width="2px" />
+  <circle cx="37" cy="151" r="14" fill="black" stroke="black" stroke-width="2px" />
+  <text x="37" y="151" fill="white" font-family="arial" text-anchor="middle" dominant-baseline="middle">6</text>
+
+  <!-- piece: 14-5 -->
+  <circle cx="73" cy="151" r="14" fill="white" stroke="black" stroke-width="2px" />
+  <text x="73" y="151" fill="black" font-family="arial" text-anchor="middle" dominant-baseline="middle">6</text>
+
+  <!-- piece: 15-5 -->
+  <circle cx="109" cy="151" r="14" fill="black" stroke="black" stroke-width="2px" />
+  <text x="109" y="151" fill="white" font-family="arial" text-anchor="middle" dominant-baseline="middle">6</text>
+
+  <!-- piece: 16-5 -->
+  <circle cx="145" cy="151" r="14" fill="white" stroke="black" stroke-width="2px" />
+  <text x="145" y="151" fill="black" font-family="arial" text-anchor="middle" dominant-baseline="middle">6</text>
+
+  <!-- piece: 17-5 -->
+  <circle cx="182" cy="151" r="14" fill="black" stroke="black" stroke-width="2px" />
+  <text x="182" y="151" fill="white" font-family="arial" text-anchor="middle" dominant-baseline="middle">6</text>
+
+  <!-- piece: 18-5 -->
+  <circle cx="219" cy="151" r="14" fill="white" stroke="black" stroke-width="2px" />
+  <text x="219" y="151" fill="black" font-family="arial" text-anchor="middle" dominant-baseline="middle">6</text>
+
+  <!-- piece: 19-5 -->
+  <circle cx="301" cy="151" r="14" fill="black" stroke="black" stroke-width="2px" />
+  <text x="301" y="151" fill="white" font-family="arial" text-anchor="middle" dominant-baseline="middle">6</text>
+
+  <!-- piece: 20-5 -->
+  <circle cx="337" cy="151" r="14" fill="white" stroke="black" stroke-width="2px" />
+  <text x="337" y="151" fill="black" font-family="arial" text-anchor="middle" dominant-baseline="middle">6</text>
+
+  <!-- piece: 21-5 -->
+  <circle cx="373" cy="151" r="14" fill="black" stroke="black" stroke-width="2px" />
+  <text x="373" y="151" fill="white" font-family="arial" text-anchor="middle" dominant-baseline="middle">6</text>
+
+  <!-- piece: 22-5 -->
+  <circle cx="409" cy="151" r="14" fill="white" stroke="black" stroke-width="2px" />
+  <text x="409" y="151" fill="black" font-family="arial" text-anchor="middle" dominant-baseline="middle">6</text>
+
+  <!-- piece: 23-5 -->
+  <circle cx="445" cy="151" r="14" fill="black" stroke="black" stroke-width="2px" />
+  <text x="445" y="151" fill="white" font-family="arial" text-anchor="middle" dominant-baseline="middle">6</text>
+
+  <!-- piece: 24-5 -->
+  <circle cx="481" cy="151" r="14" fill="white" stroke="black" stroke-width="2px" />
+  <text x="481" y="151" fill="black" font-family="arial" text-anchor="middle" dominant-baseline="middle">6</text>
+
+  <!-- pieces: 12-1 - 12-5 -->
+  <circle cx="37" cy="385" r="14" fill="white" stroke="black" stroke-width="2px" />
+  <circle cx="37" cy="356" r="14" fill="black" stroke="black" stroke-width="2px" />
+  <circle cx="37" cy="327" r="14" fill="white" stroke="black" stroke-width="2px" />
+  <circle cx="37" cy="298" r="14" fill="black" stroke="black" stroke-width="2px" />
+  <circle cx="37" cy="269" r="14" fill="white" stroke="black" stroke-width="2px" />
+  <text x="37" y="269" fill="black" font-family="arial" text-anchor="middle" dominant-baseline="middle">6</text>
+
+  <!-- piece: 11-5 -->
+  <circle cx="73" cy="269" r="14" fill="black" stroke="black" stroke-width="2px" />
+  <text x="73" y="269" fill="white" font-family="arial" text-anchor="middle" dominant-baseline="middle">6</text>
+
+  <!-- piece: 10-5 -->
+  <circle cx="109" cy="269" r="14" fill="white" stroke="black" stroke-width="2px" />
+  <text x="109" y="269" fill="black" font-family="arial" text-anchor="middle" dominant-baseline="middle">6</text>
+
+  <!-- piece: 9-5 -->
+  <circle cx="145" cy="269" r="14" fill="black" stroke="black" stroke-width="2px" />
+  <text x="145" y="269" fill="white" font-family="arial" text-anchor="middle" dominant-baseline="middle">6</text>
+
+  <!-- piece: 8-5 -->
+  <circle cx="182" cy="269" r="14" fill="white" stroke="black" stroke-width="2px" />
+  <text x="182" y="269" fill="black" font-family="arial" text-anchor="middle" dominant-baseline="middle">6</text>
+
+  <!-- piece: 7-5 -->
+  <circle cx="219" cy="269" r="14" fill="black" stroke="black" stroke-width="2px" />
+  <text x="219" y="269" fill="white" font-family="arial" text-anchor="middle" dominant-baseline="middle">6</text>
+
+  <!-- piece: 6-5 -->
+  <circle cx="301" cy="269" r="14" fill="white" stroke="black" stroke-width="2px" />
+  <text x="301" y="269" fill="black" font-family="arial" text-anchor="middle" dominant-baseline="middle">6</text>
+
+  <!-- piece: 5-5 -->
+  <circle cx="337" cy="269" r="14" fill="black" stroke="black" stroke-width="2px" />
+  <text x="337" y="269" fill="white" font-family="arial" text-anchor="middle" dominant-baseline="middle">6</text>
+
+  <!-- piece: 4-5 -->
+  <circle cx="373" cy="269" r="14" fill="white" stroke="black" stroke-width="2px" />
+  <text x="373" y="269" fill="black" font-family="arial" text-anchor="middle" dominant-baseline="middle">6</text>
+
+  <!-- piece: 3-5 -->
+  <circle cx="409" cy="269" r="14" fill="black" stroke="black" stroke-width="2px" />
+  <text x="409" y="269" fill="white" font-family="arial" text-anchor="middle" dominant-baseline="middle">6</text>
+
+  <!-- piece: 2-5 -->
+  <circle cx="445" cy="269" r="14" fill="white" stroke="black" stroke-width="2px" />
+  <text x="445" y="269" fill="black" font-family="arial" text-anchor="middle" dominant-baseline="middle">6</text>
+
+  <!-- piece: 1-5 -->
+  <circle cx="481" cy="269" r="14" fill="black" stroke="black" stroke-width="2px" />
+  <text x="481" y="269" fill="white" font-family="arial" text-anchor="middle" dominant-baseline="middle">6</text>
+
+  <!-- cube: undoubled -->
+  <rect x="238" y="186" height="44" width="44" fill="white" stroke="black" stroke-width="2px" rx="10" ry="10" />
+  <text x="260" y="210" font-family="arial" text-anchor="middle" dominant-baseline="middle">64</text>
+
+  <!-- cube: player1 -->
+  <rect x="238" y="352" height="44" width="44" fill="white" stroke="black" stroke-width="2px" rx="10" ry="10" />
+  <text x="260" y="376" font-family="arial" text-anchor="middle" dominant-baseline="middle">2</text>
+
+  <!-- cube: player2 -->
+  <rect x="238" y="24" height="44" width="44" fill="white" stroke="black" stroke-width="2px" rx="10" ry="10" />
+  <text x="260" y="48" font-family="arial" text-anchor="middle" dominant-baseline="middle">4</text>
+
+  <!-- player1 bar pieces -->
+  <circle cx="260" cy="164" r="14" fill="black" stroke="black" stroke-width="black" />
+  <circle cx="260" cy="132" r="14" fill="black" stroke="black" stroke-width="black" />
+  <circle cx="260" cy="100" r="14" fill="black" stroke="black" stroke-width="black" />
+  <text x="260" y="100" fill="white" font-family="arial" text-anchor="middle" dominant-baseline="middle">4</text>
+
+  <!-- player2 bar pieces -->
+  <circle cx="260" cy="256" r="14" fill="white" stroke="black" stroke-width="black" />
+  <circle cx="260" cy="288" r="14" fill="white" stroke="black" stroke-width="black" />
+  <circle cx="260" cy="320" r="14" fill="white" stroke="black" stroke-width="black" />
+  <text x="260" y="320" fill="black" font-family="arial" text-anchor="middle" dominant-baseline="middle">4</text>
+
+  <!-- player 1, die 1 -->
+  <rect x="332" y="186" height="48" width="48" fill="black" stroke="black" stroke-width="2px" rx="10" ry="10" />
+
+  <!-- player 1, die 1, spots -->
+  <circle cx="356" cy="210" r="5" fill="white" /> <!-- center -->
+  <circle cx="368" cy="198" r="5" fill="white" /> <!-- top-right -->
+  <circle cx="344" cy="222" r="5" fill="white" /> <!-- bottom-left -->
+  <circle cx="368" cy="222" r="5" fill="white" /> <!-- bottom-right -->
+  <circle cx="344" cy="198" r="5" fill="white" /> <!-- top-left -->
+  <circle cx="368" cy="210" r="5" fill="white" /> <!-- middle-right -->
+  <circle cx="344" cy="210" r="5" fill="white" /> <!-- middle-left -->
+  <!-- player 1, die 2 -->
+  <rect x="404" y="186" height="48" width="48" fill="black" stroke="black" stroke-width="2px" rx="10" ry="10" />
+
+  <!-- player 1, die 2, spots -->
+  <circle cx="428" cy="210" r="5" fill="white" /> <!-- center -->
+  <circle cx="440" cy="198" r="5" fill="white" /> <!-- top-right -->
+  <circle cx="416" cy="222" r="5" fill="white" /> <!-- bottom-left -->
+  <circle cx="440" cy="222" r="5" fill="white" /> <!-- bottom-right -->
+  <circle cx="416" cy="198" r="5" fill="white" /> <!-- top-left -->
+  <circle cx="440" cy="210" r="5" fill="white" /> <!-- middle-right -->
+  <circle cx="416" cy="210" r="5" fill="white" /> <!-- middle-left -->
+  <!-- player2 dice go in the same place as player2 dice, but they're white with white spots -->
+
+</svg>
