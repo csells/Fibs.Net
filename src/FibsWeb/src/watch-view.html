@@ -2,8 +2,6 @@
 
 <dom-module id="watch-view">
   <template>
-    <p>[[board.board]]</p>
-    <!-- based on bg-full.svg -->
     <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="574" height="420">
       <!-- frame -->
       <rect x="0" y="0" height="420" width="574" fill="white" stroke="black" stroke-width="5" />
@@ -88,6 +86,12 @@
       <template is="dom-repeat" items="[[_pieces]]" as="p">
         <circle cx$="[[p.pos.cx]]" cy$="[[p.pos.cy]]" r="14" fill$="[[p.color]]" stroke="black" stroke-width="2px" />
       </template>
+
+      <!-- overflow pieces -->
+      <!--<text x="260" y="100" fill="white" font-family="arial" text-anchor="middle" dominant-baseline="middle">4</text>-->
+      <template is="dom-repeat" items="[[_overflows]]" as="o">
+        <text x$="[[o.pos.cx]]" y$="[[o.pos.cy]]" fill$="[[o.color]]" font-family="arial" text-anchor="middle" dominant-baseline="middle">[[o.count]]</text>
+      </template>
     </svg>
   </template>
 
@@ -102,10 +106,9 @@
 
       properties: {
         board: Object,
-        _pieces: {
-          type: Array,
-          computed: "_getPieces(board.board)",
-        },
+        _pieces: { computed: "_getPieces(board.board)" },
+        //_overflows: { value: function () { return [{ pos: { cx: 260, cy: 100 }, color: "white", count: 4 }]; } },
+        _overflows: { computed: "_getOverflows(board.board)" },
       },
 
       ready: function () {
@@ -113,7 +116,7 @@
         let cysBottom = [385, 356, 327, 298, 269];
 
         this._poses = [
-          { cx: 260, cys: [100, 132, 164] }, // player 1 bar
+          { cx: 260, cys: [164, 132, 100] }, // player 1 bar
 
           // bottom
           { cx: 481, cys: cysBottom }, // pip 1
@@ -154,30 +157,36 @@
       // from http://www.fibs.com/fibs_interface.html#board_state
       _getPieces: function (s) {
         if (!s) { return null; }
+
         // TODO: turn this into map(...).reduce(a,b){return a.concat(b);} to simulate SelectMany
         let pieces = [];
         s.split(":").forEach((ch, pip) => {
-          let c = parseInt(ch); // piece count for the current pip
-          for (let i = 0; i != Math.abs(c) ; ++i) {
-            pieces.push({ pos: this._getPiecePos(pip, i), color: c < 0 ? "black" : "white" });
+          let count = parseInt(ch); // piece count for the current pip
+          let maxCount = this._poses[pip].cys.length;
+          for (let i = 0; i != Math.min(Math.abs(count), maxCount) ; ++i) {
+            let pos = { cx: this._poses[pip].cx, cy: this._poses[pip].cys[i] };
+            pieces.push({ pos: pos, color: count < 0 ? "black" : "white" });
           }
         });
         return pieces;
       },
 
-      // TODO
-      // if(pos==null) that indicates an "overflow", i.e. a piece that goes beyond the
-      // 5 we can show that means we need to show an overflow number, e.g. "6"
+      // any piece on a pip (or bar) beyond the number of pieces that can be shown indicates an "overflow",
+      // which means we need to show an overall piece count on that pip (or bar), e.g. "6"
       _getOverflows: function (s) {
-      },
+        if (!s) { return null; }
 
-      // Given a pip and an index, return the position
-      // Every index > 4 (in the range 0-4) throws an exception, meaning it can't be placed
-      // on the board directly, but has to be shown in a different way (like with a number)
-      // pip == 0 and pip == 25 represent the bar
-      _getPiecePos(pip, i) {
-        if (pip < 0 || pip > this._poses.length || i < 0 || i > this._poses[pip].cys.length) { throw `can't get piece on bar ${pip} @ index ${i}`; }
-        return { cx: this._poses[pip].cx, cy: this._poses[pip].cys[i] };
+        // TODO: turn this into map(...).reduce(a,b){return a.concat(b);} to simulate SelectMany
+        let overflows = [];
+        s.split(":").forEach((ch, pip) => {
+          let count = parseInt(ch); // piece count for the current pip
+          let maxCount = this._poses[pip].cys.length;
+          if (Math.abs(count) > maxCount) {
+            let pos = { cx: this._poses[pip].cx, cy: this._poses[pip].cys[maxCount - 1] };
+            overflows.push({ pos: pos, color: count < 0 ? "white" : "black", count: Math.abs(count) });
+          }
+        });
+        return overflows;
       },
 
     });
