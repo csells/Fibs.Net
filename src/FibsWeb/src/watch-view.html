@@ -86,13 +86,14 @@
 
       <!-- pieces -->
       <template is="dom-repeat" items="[[_pieces]]" as="p">
-        <circle cx$="[[p.cx]]" cy$="[[p.cy]]" r="14" fill$="[[p.color]]" stroke="black" stroke-width="2px" />
+        <circle cx$="[[p.pos.cx]]" cy$="[[p.pos.cy]]" r="14" fill$="[[p.color]]" stroke="black" stroke-width="2px" />
       </template>
     </svg>
   </template>
 
   <!-- NOTE: Needs to come before the call to Polymer() -->
-  <!-- work-around for SVG binding issue in Polymer from https://github.com/Polymer/polymer/issues/1976 -->
+  <!-- work-around for SVG binding issue in Polymer -->
+  <!-- from https://github.com/Polymer/polymer/issues/1976 -->
   <script src="svg-template-support.js"></script>
 
   <script>
@@ -107,10 +108,76 @@
         },
       },
 
+      ready: function () {
+        let cysTop = [35, 64, 93, 122, 151];
+        let cysBottom = [385, 356, 327, 298, 269];
+
+        this._poses = [
+          { cx: 260, cys: [100, 132, 164] }, // player 1 bar
+
+          // bottom
+          { cx: 481, cys: cysBottom }, // pip 1
+          { cx: 445, cys: cysBottom }, // pip 2
+          { cx: 409, cys: cysBottom }, // pip 3
+          { cx: 373, cys: cysBottom }, // pip 4
+          { cx: 337, cys: cysBottom }, // pip 5
+          { cx: 301, cys: cysBottom }, // pip 6
+          { cx: 219, cys: cysBottom }, // pip 7
+          { cx: 182, cys: cysBottom }, // pip 8
+          { cx: 145, cys: cysBottom }, // pip 9
+          { cx: 109, cys: cysBottom }, // pip 10
+          { cx: 73, cys: cysBottom }, // pip 11
+          { cx: 37, cys: cysBottom }, // pip 12
+
+          // top
+          { cx: 37, cys: cysTop }, // pip 13
+          { cx: 73, cys: cysTop }, // pip 14
+          { cx: 109, cys: cysTop }, // pip 15
+          { cx: 145, cys: cysTop }, // pip 16
+          { cx: 182, cys: cysTop }, // pip 17
+          { cx: 219, cys: cysTop }, // pip 18
+          { cx: 301, cys: cysTop }, // pip 19
+          { cx: 337, cys: cysTop }, // pip 20
+          { cx: 373, cys: cysTop }, // pip 21
+          { cx: 409, cys: cysTop }, // pip 22
+          { cx: 445, cys: cysTop }, // pip 23
+          { cx: 481, cys: cysTop }, // pip 24
+
+          { cx: 260, cys: [256, 288, 320] }, // player 2 bar
+        ];
+
+      },
+
+      // 26 numbers giving the board. Positions 0 and 25 represent the bars for the players.
+      // Positive numbers represent 0's pieces and negative numbers represent X's pieces.
       // e.g. 0:-2:0:0:0:0:5:0:3:0:0:0:-5:5:0:0:0:-3:0:-5:0:0:0:0:2:0
+      // from http://www.fibs.com/fibs_interface.html#board_state
       _getPieces: function (s) {
-        return s.split(":").map((n, i) => { return { cx: i, cy: i, color: "black" }; });
-        //return [{ cx: 0, cy: 0, color: "black", }, ];
+        if (!s) { return null; }
+        // TODO: turn this into map(...).reduce(a,b){return a.concat(b);} to simulate SelectMany
+        let pieces = [];
+        s.split(":").forEach((ch, pip) => {
+          let c = parseInt(ch); // piece count for the current pip
+          for (let i = 0; i != Math.abs(c) ; ++i) {
+            pieces.push({ pos: this._getPiecePos(pip, i), color: c < 0 ? "black" : "white" });
+          }
+        });
+        return pieces;
+      },
+
+      // TODO
+      // if(pos==null) that indicates an "overflow", i.e. a piece that goes beyond the
+      // 5 we can show that means we need to show an overflow number, e.g. "6"
+      _getOverflows: function (s) {
+      },
+
+      // Given a pip and an index, return the position
+      // Every index > 4 (in the range 0-4) throws an exception, meaning it can't be placed
+      // on the board directly, but has to be shown in a different way (like with a number)
+      // pip == 0 and pip == 25 represent the bar
+      _getPiecePos(pip, i) {
+        if (pip < 0 || pip > this._poses.length || i < 0 || i > this._poses[pip].cys.length) { throw `can't get piece on bar ${pip} @ index ${i}`; }
+        return { cx: this._poses[pip].cx, cy: this._poses[pip].cys[i] };
       },
 
     });

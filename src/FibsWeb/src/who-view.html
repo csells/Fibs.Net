@@ -102,6 +102,7 @@
       },
 
       _watch: function (e) {
+        this._client.look(e.target.dataOpponent);
         this._client.watch(e.target.dataOpponent);
       },
 

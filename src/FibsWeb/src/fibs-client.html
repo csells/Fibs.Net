@@ -30,9 +30,7 @@
       watching: {
         type: Array,
         notify: true,
-        //value: function () { return [] },
-        // TODO: remove this -- just testing
-        value: function () { return { board: "0:-2:0:0:0:0:5:0:3:0:0:0:-5:5:0:0:0:-3:0:-5:0:0:0:0:2:0" }; },
+        value: function () { return [] },
       },
 
       redoublesValues: {
@@ -258,6 +256,11 @@
     //#endregion
 
     //#region watch
+    look: function (name) {
+      if (!name) { throw "look: need a name"; }
+      this._send(`look ${name}`);
+    },
+
     watch: function (name) {
       if (name) { this._send(`watch ${name}`); }
       else { this._send("unwatch"); }
