@@ -219,7 +219,7 @@ namespace Fibs {
 
     // for RUN_STATE
     static List<CookieDough> AlphaBatch = new List<CookieDough> {
-      new CookieDough { Cookie = FibsCookie.FIBS_Board, Regex = new Regex(@"^board:(?<player1>[^:]+):(?<player2>[^:]+):(?<matchLength>\d+):(?<player1Score>\d):(?<player2Score>\d):(?<board>([-0-9]+:){25}[0-9]+):(?<turn>[0-9]+):(?<player1Dice>\d:\d):(?<player2Dice>\d:\d):(?<doublingCube>\d+):(?<player1MayDouble>[0-1]):(?<player2MayDouble>[0-1]):(?<wasDoubled>[0-1]):(?<color>-?1):(?<direction>-?1):\d+:\d+:(?<player1Home>\d+):(?<player2Home>\d+):(?<player1Bar>\d+):(?<player2Bar>\d+):(?<canMove>[0-4]):\d+:\d+:(?<redoubles>\d+)$"), },
+      new CookieDough { Cookie = FibsCookie.FIBS_Board, Regex = new Regex(@"^board:(?<player1>[^:]+):(?<player2>[^:]+):(?<matchLength>\d+):(?<player1Score>\d):(?<player2Score>\d):(?<board>([-0-9]+:){25}[0-9]+):(?<turnColor>[0-9]+):(?<player1Dice>\d:\d):(?<player2Dice>\d:\d):(?<doublingCube>\d+):(?<player1MayDouble>[0-1]):(?<player2MayDouble>[0-1]):(?<wasDoubled>[0-1]):(?<player1Color>-?1):(?<direction>-?1):\d+:\d+:(?<player1Home>\d+):(?<player2Home>\d+):(?<player1Bar>\d+):(?<player2Bar>\d+):(?<canMove>[0-4]):\d+:\d+:(?<redoubles>\d+)$"), },
       new CookieDough { Cookie = FibsCookie.FIBS_BAD_Board, Regex = new Regex("^board: (?<board>.*)"), },
       new CookieDough { Cookie = FibsCookie.FIBS_YouRoll, Regex = new Regex("^You roll (?<die1>[1-6]) and (?<die2>[1-6])"), },
       new CookieDough { Cookie = FibsCookie.FIBS_PlayerRolls, Regex = new Regex("^(?<opponent>[a-zA-Z_<>]+) rolls (?<die1>[1-6]) and (?<die2>[1-6])"), },

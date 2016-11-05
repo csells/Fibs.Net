@@ -76,10 +76,10 @@
       <text x="446" y="414" font-family="arial" text-anchor="middle">2</text>
       <text x="482" y="414" font-family="arial" text-anchor="middle">1</text>
 
-      <!-- player1 cave -->
+      <!-- player1 home -->
       <rect x="520" y="220" height="180" width="32" fill="darkgreen" stroke="black" stroke-width="2" />
 
-      <!-- player2 cave -->
+      <!-- player2 home -->
       <rect x="520" y="20" height="180" width="32" fill="darkgreen" stroke="black" stroke-width="2" />
 
       <!-- pieces -->
@@ -92,7 +92,33 @@
       <template is="dom-repeat" items="[[_overflows]]" as="o">
         <text x$="[[o.pos.cx]]" y$="[[o.pos.cy]]" fill$="[[o.color]]" font-family="arial" text-anchor="middle" dominant-baseline="middle">[[o.count]]</text>
       </template>
+
+      <!-- dice -->
+      <rect x="332" y="186" height="48" width="48" fill$="[[_diceColor(board.turnColor)]]" stroke="black" stroke-width="2px" rx="10" ry="10" />
+      <rect x="404" y="186" height="48" width="48" fill$="[[_diceColor(board.turnColor)]]" stroke="black" stroke-width="2px" rx="10" ry="10" />
+
+      <!-- dice spots -->
+      <template is="dom-repeat" items="[[_spots]]" as="s">
+        <circle cx$="[[s.cx]]" cy$="[[s.cy]]" fill$="[[_spotsColor(board.turnColor)]]" r="5" />
+      </template>
+
+      <!-- cube -->
+      <template is="dom-repeat" items="[[_cubes]]" as="c">
+        <rect x$="[[c.rx]]" y$="[[c.ry]]" height="44" width="44" fill="white" stroke="black" stroke-width="2px" rx="10" ry="10" />
+        <text x$="[[c.tx]]" y$="[[c.tx]]" font-family="arial" text-anchor="middle" dominant-baseline="middle">[[board.doublingCube]]</text>
+      </template>
+
+      <!-- home -->
+      <template is="dom-repeat" items="[[_homePieces]]" as="h">
+        <rect x="522" y$="[[h.y]]" fill$="[[h.color]]" height="11" width="28" stroke="grey" stroke-width="2" />
+      </template>
     </svg>
+    <div>
+      [[board.matchLength]]-point match.
+      [[board.player1Color]]: [[board.player1]]: [[board.player1Score]] point(s).
+      [[_player2Color(board.player1Color)]]: [[board.player2]]: [[board.player2Score]] point(s).
+      [[_whosTurn(board.turnColor)]] turn.
+    </div>
   </template>
 
   <!-- NOTE: Needs to come before the call to Polymer() -->
@@ -107,8 +133,10 @@
       properties: {
         board: Object,
         _pieces: { computed: "_getPieces(board.board)" },
-        //_overflows: { value: function () { return [{ pos: { cx: 260, cy: 100 }, color: "white", count: 4 }]; } },
         _overflows: { computed: "_getOverflows(board.board)" },
+        _spots: { computed: "_getSpots(board.turnColor)" },
+        _cubes: { computed: "_getCubes(board.doublingCube)" },
+        _homePieces: { computed: "_getHomePieces(board.player1Home, board.player2Home)" },
       },
 
       ready: function () {
@@ -158,7 +186,6 @@
       _getPieces: function (s) {
         if (!s) { return null; }
 
-        // TODO: turn this into map(...).reduce(a,b){return a.concat(b);} to simulate SelectMany
         let pieces = [];
         s.split(":").forEach((ch, pip) => {
           let count = parseInt(ch); // piece count for the current pip
@@ -168,6 +195,13 @@
             pieces.push({ pos: pos, color: count < 0 ? "black" : "white" });
           }
         });
+
+        // TODO: remove -- just making sense of the FIBS protocol
+        let player1Bar = s.split(":")[0];
+        let player2Bar = s.split(":")[25];
+        if (player1Bar != this.board.player1Bar) { console.log(`split:player1Bar(${player1Bar}) != board:player1Bar(${this.board.player1Bar})`); }
+        if (player2Bar != this.board.player2Bar) { console.log(`split:player2Bar(${player2Bar}) != board:player2Bar(${this.board.player2Bar})`); }
+
         return pieces;
       },
 
@@ -176,7 +210,6 @@
       _getOverflows: function (s) {
         if (!s) { return null; }
 
-        // TODO: turn this into map(...).reduce(a,b){return a.concat(b);} to simulate SelectMany
         let overflows = [];
         s.split(":").forEach((ch, pip) => {
           let count = parseInt(ch); // piece count for the current pip
@@ -189,7 +222,68 @@
         return overflows;
       },
 
-    });
+      _player2Color: function (player1Color) {
+        return player1Color == "X" ? "O" : "X";
+      },
 
+      _whosTurn: function (turnColor) {
+        if (!turnColor) { return "game over" };
+        return turnColor == this.board.player1Color ? (this.board.player1 == "You" ? "Your" : this.board.player1 + "'s") : this.board.player2 + "'s";
+      },
+
+      _diceColor: function (turnColor) {
+        return turnColor == "X" ? "black" : "white";
+      },
+
+      _spotsColor: function (turnColor) {
+        return turnColor == "X" ? "white" : "black";
+      },
+
+      _getSpots: function (turnColor) {
+        let dice = turnColor == this.board.player1Color ? this.board.player1Dice : this.board.player2Dice;
+        if (!dice) { return null; }
+
+        let cxsDice = [{ left: 344, middle: 356, right: 368 }, { left: 416, middle: 428, right: 440 }];
+        let cysDice = [{ top: 198, middle: 210, bottom: 222 }, { top: 198, middle: 210, bottom: 222 }];
+
+        let spots = (die, cxs, cys) => {
+          switch (die) {
+            case 1: return [{ cx: cxs.middle, cy: cys.middle }];
+            case 2: return [{ cx: cxs.right, cy: cys.top }, { cx: cxs.left, cy: cys.bottom }];
+            case 3: return [{ cx: cxs.right, cy: cys.top }, { cx: cxs.middle, cy: cys.middle }, { cx: cxs.left, cy: cys.bottom }];
+            case 4: return [{ cx: cxs.right, cy: cys.top }, { cx: cxs.left, cy: cys.bottom }, { cx: cxs.left, cy: cys.top }, { cx: cxs.right, cy: cys.bottom }];
+            case 5: return [{ cx: cxs.right, cy: cys.top }, { cx: cxs.left, cy: cys.bottom }, { cx: cxs.left, cy: cys.top }, { cx: cxs.right, cy: cys.bottom }, { cx: cxs.middle, cy: cys.middle }];
+            case 6: return [{ cx: cxs.right, cy: cys.top }, { cx: cxs.left, cy: cys.bottom }, { cx: cxs.left, cy: cys.top }, { cx: cxs.right, cy: cys.bottom }, { cx: cxs.right, cy: cys.middle }, { cx: cxs.left, cy: cys.middle }];
+            default: throw `unknown die: ${die}`;
+          }
+        };
+
+        return spots(dice[0], cxsDice[0], cysDice[0]).concat(spots(dice[1], cxsDice[1], cysDice[1]));
+      },
+
+      _getCubes: function (doublingCube) {
+        if (!doublingCube) { return null; }
+
+        let cubes = [
+          /* neither */ null,
+          /* player1 */ { rx: 238, ry: 352, tx: 260, ty: 376 },
+          /* player2 */ { rx: 238, ry: 24, tx: 260, ty: 48 },
+          /* either */  { rx: 238, ry: 186, tx: 260, ty: 210 },
+        ];
+
+        return [cubes[(this.board.player1MayDouble ? 1 : 0) + (this.board.player2MayDouble ? 2 : 0)]];
+      },
+
+      _getHomePieces: function (player1Home, player2Home) {
+        let ys1 = [387, 376, 365, 354, 343, 332, 321, 310, 299, 288, 277, 266, 255, 244, 233];
+        let ys2 = [22, 33, 44, 55, 66, 77, 88, 99, 110, 121, 132, 143, 154, 165, 176];
+
+        let home1 = player1Home ? ys1.slice(0, player1Home).map(y=> { return { y: y, color: this._diceColor(this.board.player1Color) } }) : [];
+        let home2 = player2Home ? ys2.slice(0, player2Home).map(y=> { return { y: y, color: this._diceColor(this._player2Color(this.board.player1Color)) } }) : [];
+
+        return home1.concat(home2);
+      },
+
+    });
   </script>
 </dom-module>

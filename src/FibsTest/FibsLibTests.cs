@@ -500,14 +500,14 @@ namespace FibsTest {
       Assert.Equal(0, int.Parse(cm.Crumbs["player1Score"]));
       Assert.Equal(1, int.Parse(cm.Crumbs["player2Score"]));
       Assert.Equal("0:-2:0:0:0:0:5:0:3:0:0:0:-5:5:0:0:0:-3:0:-5:0:0:0:0:2:0", cm.Crumbs["board"]);
-      Assert.Equal("O", CookieMonster.ParseBoardTurn(cm.Crumbs["turn"]));
+      Assert.Equal("O", CookieMonster.ParseBoardTurn(cm.Crumbs["turnColor"]));
       Assert.Equal("6:2", cm.Crumbs["player1Dice"]);
       Assert.Equal("0:0", cm.Crumbs["player2Dice"]);
       Assert.Equal(1, int.Parse(cm.Crumbs["doublingCube"]));
       Assert.True(CookieMonster.ParseBool(cm.Crumbs["player1MayDouble"]));
       Assert.True(CookieMonster.ParseBool(cm.Crumbs["player2MayDouble"]));
       Assert.False(CookieMonster.ParseBool(cm.Crumbs["wasDoubled"]));
-      Assert.Equal("O", CookieMonster.ParseBoardColor(cm.Crumbs["color"]));
+      Assert.Equal("O", CookieMonster.ParseBoardColor(cm.Crumbs["player1Color"]));
       Assert.Equal(-1, int.Parse(cm.Crumbs["direction"]));
       Assert.Equal(0, int.Parse(cm.Crumbs["player1Home"]));
       Assert.Equal(0, int.Parse(cm.Crumbs["player2Home"]));
