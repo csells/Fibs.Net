@@ -292,15 +292,21 @@ namespace Fibs {
       new CookieDough { Cookie = FibsCookie.FIBS_ShowMovesOther, Regex = new Regex("^[XO]:"), },     // AND HERE
       new CookieDough { Cookie = FibsCookie.FIBS_ScoreUpdate, Regex = new Regex("^score in (?<points>[0-9]+) point match:"), },
       new CookieDough { Cookie = FibsCookie.FIBS_MatchStart, Regex = new Regex("^Score is (?<score1>[0-9]+)-(?<score2>[0-9]+) in a (?<points>[0-9]+) point match\\."), },
-      new CookieDough { Cookie = FibsCookie.FIBS_Settings, Regex = new Regex("^Settings of variables:"), },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsHeader, Regex = new Regex("^Settings of variables:"), },
       new CookieDough { Cookie = FibsCookie.FIBS_SettingsValue, Regex = new Regex("^(?<name>allowpip|autoboard|autodouble|automove|bell|crawford|double|moreboards|moves|greedy|notify|ratings|ready|report|silent|telnet|wrap) +(?<value>YES|NO)"), },
       new CookieDough { Cookie = FibsCookie.FIBS_Turn, Regex = new Regex("^turn:"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_Boardstyle, Regex = new Regex("^boardstyle:"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_Linelength, Regex = new Regex("^linelength:"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_Pagelength, Regex = new Regex("^pagelength:"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_Redoubles, Regex = new Regex("^redoubles:"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_Sortwho, Regex = new Regex("^sortwho:"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_Timezone, Regex = new Regex("^timezone:"), },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsValue, Regex = new Regex("^(?<name>boardstyle): +(?<value>[1-3])"), },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsChange, Regex = new Regex("^Value of '(?<name>boardstyle)' set to (?<value>[1-3])\\."), },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsValue, Regex = new Regex("^(?<name>linelength): +(?<value>[0-9]+)"), },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsChange, Regex = new Regex("^Value of '(?<name>linelength)' set to (?<value>[0-9]+)\\."), },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsValue, Regex = new Regex("^(?<name>pagelength): +(?<value>[0-9]+)"), },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsChange, Regex = new Regex("^Value of '(?<name>pagelength)' set to (?<value>[0-9]+)\\."), },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsValue, Regex = new Regex("^(?<name>redoubles): +(?<value>none|unlimited|[0-9]+)"), },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsChange, Regex = new Regex("^Value of '(?<name>redoubles)' set to '(?<value>none|unlimited|[0-9]+)'\\."), },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsValue, Regex = new Regex("^(?<name>sortwho): +(?<value>login|name|rating|rrating)"), },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsChange, Regex = new Regex("^Value of '(?<name>sortwho)' set to (?<value>login|name|rating|rrating)"), },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsValue, Regex = new Regex("^(?<name>timezone): +(?<value>.*)"), },
+      new CookieDough { Cookie = FibsCookie.FIBS_SettingsChange, Regex = new Regex("^Value of '(?<name>timezone)' set to (?<value>.*)\\."), },
       new CookieDough { Cookie = FibsCookie.FIBS_CantMove, Regex = new Regex("^(?<name>[a-zA-Z_<>]+) can't move"), }, // PLAYER can't move || You can't move
       new CookieDough { Cookie = FibsCookie.FIBS_ListOfGames, Regex = new Regex("^List of games:"), },
       new CookieDough { Cookie = FibsCookie.FIBS_PlayerInfoStart, Regex = new Regex("^Information about"), },
@@ -352,10 +358,6 @@ namespace Fibs {
       new CookieDough { Cookie = FibsCookie.FIBS_NoInfo, Regex = new Regex("^No information found on user"), },
       new CookieDough { Cookie = FibsCookie.FIBS_SettingsChange, Regex = new Regex("^You're away\\. Please type 'back'"), Extras = new Dictionary<string, string> { ["name"] = "away", ["value"] = "YES" } },
       new CookieDough { Cookie = FibsCookie.FIBS_SettingsChange, Regex = new Regex("^Welcome back\\."), Extras = new Dictionary<string, string> { ["name"] = "away", ["value"] = "NO" } },
-      new CookieDough { Cookie = FibsCookie.FIBS_SettingsChange, Regex = new Regex("^Value of '(?<name>redoubles)' set to 'none'."), Extras = new Dictionary<string, string> { ["value"] = "0" } },
-      new CookieDough { Cookie = FibsCookie.FIBS_SettingsChange, Regex = new Regex("^Value of '(?<name>redoubles)' set to '(?<value>unlimited)'\\."), },
-      new CookieDough { Cookie = FibsCookie.FIBS_SettingsChange, Regex = new Regex("^Value of '(?<name>redoubles)' set to (?<value>[0-9]+)\\."), },
-      new CookieDough { Cookie = FibsCookie.FIBS_SettingsChange, Regex = new Regex("^Value of '(?<name>timezone)' set to (?<value>[^\\.]+)\\."), },
     };
 
     //--- Numeric messages ---------------------------------------------------
@@ -646,7 +648,6 @@ namespace Fibs {
     FIBS_StartingNewGame,
     FIBS_PlayerAcceptsDouble,
     FIBS_YouAcceptDouble,
-    FIBS_Settings,
     FIBS_Turn,
     FIBS_FirstRoll,
     FIBS_DoublingCubeNow,
@@ -678,12 +679,6 @@ namespace Fibs {
     FIBS_MatchResult,
     FIBS_YouGiveUp,
     FIBS_PlayerIsWaitingForYou,
-    FIBS_Boardstyle,
-    FIBS_Linelength,
-    FIBS_Pagelength,
-    FIBS_Redoubles,
-    FIBS_Sortwho,
-    FIBS_Timezone,
     FIBS_SettingsValue, // csells
     FIBS_SettingsChange, // csells
     FIBS_RunningDiceTest, // csells

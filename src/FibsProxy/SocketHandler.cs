@@ -56,7 +56,7 @@ namespace FibsProxy {
         // (and remember to take the hack out of the client...)
         var user = match.Groups["user"].Value;
         var password = match.Groups["password"].Value;
-        Task<CookieMessage[]> fibsReadTask = fibs.Login(user, password);
+        Task<CookieMessage[]> fibsReadTask = fibs.LoginAsync(user, password);
         Debug.WriteLine($"FibsLoop: logging into FIBS for {user}");
 
         // get more socket input
@@ -91,7 +91,7 @@ namespace FibsProxy {
             }
 
             // write socket input to FIBS and wait for more socket input
-            await fibs.WriteLineAsync(s);
+            await fibs.SendAsync(s);
             socketReceiveTask = socket.ReceiveAsync(socketSegment, cancel);
           }
           else if (task.Equals(fibsReadTask)) {
@@ -111,7 +111,7 @@ namespace FibsProxy {
             }
 
             // wait for more FIBS input
-            fibsReadTask = fibs.ReadMessagesAsync();
+            fibsReadTask = fibs.ReceiveAsync();
           }
           else {
             Debug.Assert(false, "Unknown task");

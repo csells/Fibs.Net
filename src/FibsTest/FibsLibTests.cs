@@ -456,7 +456,7 @@ namespace FibsTest {
       var cm = monster.EatCookie(s);
       Assert.Equal(FibsCookie.FIBS_SettingsChange, cm.Cookie);
       Assert.Equal("redoubles", cm.Crumbs["name"]);
-      Assert.Equal(0, int.Parse(cm.Crumbs["value"]));
+      Assert.Equal("none", cm.Crumbs["value"]);
     }
 
     public void FIBS_RedoublesChangeToNumber() {
@@ -515,6 +515,81 @@ namespace FibsTest {
       Assert.Equal(0, int.Parse(cm.Crumbs["player2Bar"]));
       Assert.Equal(2, int.Parse(cm.Crumbs["canMove"]));
       Assert.Equal(0, int.Parse(cm.Crumbs["redoubles"]));
+    }
+
+    [Fact]
+    public void FIBS_SettingsValue_Set() {
+      var monster = CreateLoggedInCookieMonster();
+      CookieMessage cm;
+
+      cm = monster.EatCookie("Settings of variables:");
+      Assert.Equal(FibsCookie.FIBS_SettingsHeader, cm.Cookie);
+
+      cm = monster.EatCookie("boardstyle: 3");
+      Assert.Equal(FibsCookie.FIBS_SettingsValue, cm.Cookie);
+      Assert.Equal("boardstyle", cm.Crumbs["name"]);
+      Assert.Equal(3, int.Parse(cm.Crumbs["value"]));
+
+      cm = monster.EatCookie("linelength: 0");
+      Assert.Equal(FibsCookie.FIBS_SettingsValue, cm.Cookie);
+      Assert.Equal("linelength", cm.Crumbs["name"]);
+      Assert.Equal(0, int.Parse(cm.Crumbs["value"]));
+
+      cm = monster.EatCookie("pagelength: 0");
+      Assert.Equal(FibsCookie.FIBS_SettingsValue, cm.Cookie);
+      Assert.Equal("pagelength", cm.Crumbs["name"]);
+      Assert.Equal(0, int.Parse(cm.Crumbs["value"]));
+
+      cm = monster.EatCookie("redoubles:  none");
+      Assert.Equal(FibsCookie.FIBS_SettingsValue, cm.Cookie);
+      Assert.Equal("redoubles", cm.Crumbs["name"]);
+      Assert.Equal("none", cm.Crumbs["value"]);
+
+      cm = monster.EatCookie("sortwho:    login");
+      Assert.Equal(FibsCookie.FIBS_SettingsValue, cm.Cookie);
+      Assert.Equal("sortwho", cm.Crumbs["name"]);
+      Assert.Equal("login", cm.Crumbs["value"]);
+
+      cm = monster.EatCookie("timezone:   America/Los_Angeles");
+      Assert.Equal(FibsCookie.FIBS_SettingsValue, cm.Cookie);
+      Assert.Equal("timezone", cm.Crumbs["name"]);
+      Assert.Equal("America/Los_Angeles", cm.Crumbs["value"]);
+    }
+
+    [Fact]
+    public void FIBS_SettingsChange_Set() {
+      var monster = CreateLoggedInCookieMonster();
+      CookieMessage cm;
+
+      cm = monster.EatCookie("Value of 'boardstyle' set to 3.");
+      Assert.Equal(FibsCookie.FIBS_SettingsChange, cm.Cookie);
+      Assert.Equal("boardstyle", cm.Crumbs["name"]);
+      Assert.Equal(3, int.Parse(cm.Crumbs["value"]));
+
+      cm = monster.EatCookie("Value of 'linelength' set to 0.");
+      Assert.Equal(FibsCookie.FIBS_SettingsChange, cm.Cookie);
+      Assert.Equal("linelength", cm.Crumbs["name"]);
+      Assert.Equal(0, int.Parse(cm.Crumbs["value"]));
+
+      cm = monster.EatCookie("Value of 'pagelength' set to 0.");
+      Assert.Equal(FibsCookie.FIBS_SettingsChange, cm.Cookie);
+      Assert.Equal("pagelength", cm.Crumbs["name"]);
+      Assert.Equal(0, int.Parse(cm.Crumbs["value"]));
+
+      cm = monster.EatCookie("Value of 'redoubles' set to 'none'.");
+      Assert.Equal(FibsCookie.FIBS_SettingsChange, cm.Cookie);
+      Assert.Equal("redoubles", cm.Crumbs["name"]);
+      Assert.Equal("none", cm.Crumbs["value"]);
+
+      cm = monster.EatCookie("Value of 'sortwho' set to login");
+      Assert.Equal(FibsCookie.FIBS_SettingsChange, cm.Cookie);
+      Assert.Equal("sortwho", cm.Crumbs["name"]);
+      Assert.Equal("login", cm.Crumbs["value"]);
+
+      cm = monster.EatCookie("Value of 'timezone' set to America/Los_Angeles.");
+      Assert.Equal(FibsCookie.FIBS_SettingsChange, cm.Cookie);
+      Assert.Equal("timezone", cm.Crumbs["name"]);
+      Assert.Equal("America/Los_Angeles", cm.Crumbs["value"]);
     }
 
   }

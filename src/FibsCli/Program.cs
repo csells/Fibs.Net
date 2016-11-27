@@ -21,7 +21,7 @@ namespace Fibs {
     }
 
     Task<CookieMessage[]> GetFibsInput() {
-      return fibs.ReadMessagesAsync();
+      return fibs.ReceiveAsync();
     }
 
     void Prompt() {
@@ -61,7 +61,7 @@ namespace Fibs {
 
       using (fibs = new FibsSession()) {
         consoleInputTask = GetConsoleInput();
-        fibsInputTask = fibs.Login(user, pw);
+        fibsInputTask = fibs.LoginAsync(user, pw);
         Prompt();
 
         while (true) {
@@ -69,7 +69,7 @@ namespace Fibs {
           if (task.Equals(consoleInputTask)) {
             var line = await consoleInputTask;
             if (!string.IsNullOrWhiteSpace(line)) {
-              await fibs.WriteLineAsync(line);
+              await fibs.SendAsync(line);
             }
             consoleInputTask = GetConsoleInput();
             Prompt();
