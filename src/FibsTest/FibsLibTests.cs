@@ -456,7 +456,7 @@ namespace FibsTest {
       var cm = monster.EatCookie(s);
       Assert.Equal(FibsCookie.FIBS_SettingsChange, cm.Cookie);
       Assert.Equal("redoubles", cm.Crumbs["name"]);
-      Assert.Equal(0, int.Parse(cm.Crumbs["value"]));
+      Assert.Equal("none", cm.Crumbs["value"]);
     }
 
     public void FIBS_RedoublesChangeToNumber() {

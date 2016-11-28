@@ -10,44 +10,34 @@ namespace FibsBoardCap {
       (new Program()).RunAsync(args).GetAwaiter().GetResult();
     }
 
+    FibsSession fibs;
+    List<string> players = new List<string>();
+
     async Task RunAsync(string[] args) {
       // FIBS test user
       string user = "dotnetcli";
       string pw = "dotnetcli1";
 
-      using (var fibs = new FibsSession()) {
+      using (fibs = new FibsSession()) {
         // catch Ctrl+C
         Console.CancelKeyPress += (sender, e) => {
           fibs.SendAsync("bye").GetAwaiter().GetResult();
-          Process(fibs.ReceiveAsync().GetAwaiter().GetResult());
+          Process(fibs.ReceiveAsync().GetAwaiter().GetResult()).GetAwaiter().GetResult();
         };
 
         // login, set the right properties and watch someone play
-        Process(await fibs.LoginAsync(user, pw));
-
-        if (!autoboard) { await fibs.SendAsync("toggle autoboard"); }
-        if (bell) { await fibs.SendAsync("toggle bell"); }
-        if (!moreboards) { await fibs.SendAsync("toggle moreboards"); }
-        if (!notify) { await fibs.SendAsync("toggle notify"); }
-        if (!report) { await fibs.SendAsync("toggle report"); }
+        await Process(await fibs.LoginAsync(user, pw));
         await fibs.SendAsync("set boardstyle 3");
 
-        while (true) {
-          var messages = await fibs.ReceiveAsync();
-          Process(messages);
-          // TODO
-        }
+        var player = args.Length != 0 ? args[0] : players[(new Random()).Next(0, players.Count)];
+        Console.WriteLine($"watching {player}");
+        await fibs.SendAsync($"watch {player}");
+
+        while (true) { await Process(await fibs.ReceiveAsync()); }
       }
     }
 
-    HashSet<string> players = new HashSet<string>();
-    bool autoboard;
-    bool bell;
-    bool moreboards;
-    bool notify;
-    bool report;
-
-    void Process(CookieMessage[] messages) {
+    async Task Process(CookieMessage[] messages) {
       foreach (var cm in messages) {
         switch (cm.Cookie) {
           case FibsCookie.CLIP_WHO_INFO:
@@ -58,26 +48,30 @@ namespace FibsBoardCap {
 
           case FibsCookie.CLIP_OWN_INFO:
             Func<string, bool> ParseBool = s => s == "1";
-            autoboard = ParseBool(cm.Crumbs["autoboard"]);
-            bell = ParseBool(cm.Crumbs["bell"]);
-            moreboards = ParseBool(cm.Crumbs["moreboards"]);
-            notify = ParseBool(cm.Crumbs["notify"]);
-            report = ParseBool(cm.Crumbs["report"]);
+            var autoboard = ParseBool(cm.Crumbs["autoboard"]);
+            var bell = ParseBool(cm.Crumbs["bell"]);
+            var moreboards = ParseBool(cm.Crumbs["moreboards"]);
+            var notify = ParseBool(cm.Crumbs["notify"]);
+            var report = ParseBool(cm.Crumbs["report"]);
 
-            Console.WriteLine($"value: autoboard= {cm.Crumbs["autoboard"]}");
-            Console.WriteLine($"value: bell= {cm.Crumbs["bell"]}");
-            Console.WriteLine($"value: moreboards= {cm.Crumbs["moreboards"]}");
-            Console.WriteLine($"value: notify= {cm.Crumbs["notify"]}");
-            Console.WriteLine($"value: report= {cm.Crumbs["report"]}");
+            if (!autoboard) { await fibs.SendAsync("toggle autoboard"); }
+            if (bell) { await fibs.SendAsync("toggle bell"); }
+            if (!moreboards) { await fibs.SendAsync("toggle moreboards"); }
+            if (!notify) { await fibs.SendAsync("toggle notify"); }
+            if (!report) { await fibs.SendAsync("toggle report"); }
             break;
 
-          case FibsCookie.FIBS_SettingsValue:
-          case FibsCookie.FIBS_SettingsChange:
-            Console.WriteLine($"value: {cm.Crumbs["name"]}= {cm.Crumbs["value"]}");
+          case FibsCookie.FIBS_Board:
+            // recognize a board in boardstyle 3 and ask for it in boardstyle 2
+            Console.WriteLine($"{cm.Cookie}: {cm.Raw}");
+            await fibs.SendAsync("set boardstyle 2");
+            await fibs.SendAsync($"board");
+            await fibs.SendAsync("set boardstyle 3");
             break;
 
-          case FibsCookie.FIBS_Goodbye:
-            Console.WriteLine("received: goodbye");
+          case FibsCookie.FIBS_Unknown:
+            if (cm.Raw.StartsWith("board:")) { throw new Exception($"unparsed board: ${cm.Raw}"); }
+            Console.WriteLine($"{cm.Cookie}: {cm.Raw}");
             break;
         }
       }
