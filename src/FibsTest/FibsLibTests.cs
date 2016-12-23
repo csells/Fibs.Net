@@ -265,12 +265,12 @@ namespace FibsTest {
     }
 
     [Fact]
-    public void IBS_Unknown() {
+    public void FIBS_Unknown() {
       var monster = CreateLoggedInCookieMonster();
       var s = "something sump something";
       var cm = monster.EatCookie(s);
       Assert.Equal(FibsCookie.FIBS_Unknown, cm.Cookie);
-      Assert.Equal("something sump something", cm.Raw);
+      Assert.Equal("something sump something", cm.Crumbs["raw"]);
     }
 
     [Fact]
@@ -590,6 +590,33 @@ namespace FibsTest {
       Assert.Equal(FibsCookie.FIBS_SettingsChange, cm.Cookie);
       Assert.Equal("timezone", cm.Crumbs["name"]);
       Assert.Equal("America/Los_Angeles", cm.Crumbs["value"]);
+    }
+
+    [Fact]
+    public void FIBS_YouAreWatching() {
+      var monster = CreateLoggedInCookieMonster();
+      var s = "You're now watching bonehead.";
+      var cm = monster.EatCookie(s);
+      Assert.Equal(FibsCookie.FIBS_YouAreWatching, cm.Cookie);
+      Assert.Equal("bonehead", cm.Crumbs["name"]);
+    }
+
+    [Fact]
+    public void FIBS_YouStopWatching() {
+      var monster = CreateLoggedInCookieMonster();
+      var s = "You stop watching bonehead.";
+      var cm = monster.EatCookie(s);
+      Assert.Equal(FibsCookie.FIBS_YouStopWatching, cm.Cookie);
+      Assert.Equal("bonehead", cm.Crumbs["name"]);
+    }
+
+    [Fact]
+    public void FIBS_NotDoingAnything() {
+      var monster = CreateLoggedInCookieMonster();
+      var s = "bonehead is not doing anything interesting.";
+      var cm = monster.EatCookie(s);
+      Assert.Equal(FibsCookie.FIBS_NotDoingAnything, cm.Cookie);
+      Assert.Equal("bonehead", cm.Crumbs["name"]);
     }
 
   }

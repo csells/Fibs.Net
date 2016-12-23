@@ -100,8 +100,7 @@ namespace FibsProxy {
 
             if (messages.Length > 0) {
               // write messages to socket
-              var json = CookieMessageJsonConverter.ToJson(messages);
-              var jsonBytes = Encoding.UTF8.GetBytes(json);
+              var jsonBytes = Encoding.UTF8.GetBytes(messages.ToJson());
               await socket.SendAsync(new ArraySegment<byte>(jsonBytes, 0, jsonBytes.Length), WebSocketMessageType.Text, true, cancel);
 
               if (messages.Any(cm => cm.Cookie == FibsCookie.FIBS_Goodbye)) {

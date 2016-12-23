@@ -166,7 +166,7 @@ namespace Fibs {
           throw new System.Exception($"Unknown state: {MessageState}");
       }
 
-      if (cm == null) { cm = new CookieMessage(FibsCookie.FIBS_Unknown, raw, null, eatState); }
+      if (cm == null) { cm = new CookieMessage(FibsCookie.FIBS_Unknown, raw, new Dictionary<string, string> { { "raw", raw } }, eatState); }
 
 #if true
       // output the initial state if no state has been shown at all
@@ -250,6 +250,7 @@ namespace Fibs {
       new CookieDough { Cookie = FibsCookie.FIBS_TypeJoin, Regex = new Regex("^Type 'join (?<opponent>[a-zA-Z_<>]+)' to accept\\."), },
       new CookieDough { Cookie = FibsCookie.FIBS_YouAreWatching, Regex = new Regex("^You're now watching (?<name>[a-zA-Z_<>]+)"), },
       new CookieDough { Cookie = FibsCookie.FIBS_YouStopWatching, Regex = new Regex("^You stop watching (?<name>[a-zA-Z_<>]+)"), },   // overloaded
+      new CookieDough { Cookie = FibsCookie.FIBS_NotDoingAnything, Regex = new Regex("^(?<name>[a-zA-Z_<>]+) is not doing anything interesting\\."), },
       new CookieDough { Cookie = FibsCookie.FIBS_PlayerStartsWatching, Regex = new Regex("(?<player1>[a-zA-Z_<>]+) starts watching (?<player2>[a-zA-Z_<>]+)"), },
       new CookieDough { Cookie = FibsCookie.FIBS_PlayerStartsWatching, Regex = new Regex("(?<name>[a-zA-Z_<>]+) is watching you"), },
       new CookieDough { Cookie = FibsCookie.FIBS_PlayerStopsWatching, Regex = new Regex("(?<name>[a-zA-Z_<>]+) stops watching (?<player>[a-zA-Z_<>]+)"), },
@@ -470,7 +471,6 @@ namespace Fibs {
       new CookieDough { Cookie = FibsCookie.FIBS_WARNINGSavedMatch, Regex = new Regex("^\\*\\* WARNING: Don't accept if you want to continue"), },
       new CookieDough { Cookie = FibsCookie.FIBS_CantGagYourself, Regex = new Regex("^\\*\\* You talk too much, don't you\\?"), },
       new CookieDough { Cookie = FibsCookie.FIBS_CantBlindYourself, Regex = new Regex("^\\*\\* You can't read this message now, can you\\?"), },
-      new CookieDough { Cookie = FibsCookie.FIBS_RunningDiceTest, Regex = new Regex("^\\*\\*\\* running dice test:"), },
       new CookieDough { Cookie = FibsCookie.FIBS_SettingsValue, Regex = new Regex("^\\*\\* You're not away\\."), Extras = new Dictionary<string, string> { ["name"] = "away", ["value"] = "NO" } },
     };
 
@@ -679,7 +679,7 @@ namespace Fibs {
     FIBS_PlayerIsWaitingForYou,
     FIBS_SettingsValue, // csells
     FIBS_SettingsChange, // csells
-    FIBS_RunningDiceTest, // csells
+    FIBS_NotDoingAnything, // csells
   }
   #endregion
 }

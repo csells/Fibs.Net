@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "FibsBoardCap": {
+      "commandName": "Project",
+      "commandLineArgs": "bonehead"
+    }
+  }
+}
