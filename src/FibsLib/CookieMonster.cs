@@ -201,12 +201,20 @@ namespace Fibs {
 
     public static bool ParseBool(string s) => s == "1" || s == "YES";
 
+    public static string ParseTurnColor(int i) {
+      return i == -1 ? "X" : i == 1 ? "O" : null;
+    }
+
     public static string ParseBoardTurn(string s) {
-      return s == "-1" ? "X" : s == "1" ? "O" : null;
+      return ParseTurnColor(int.Parse(s));
+    }
+
+    public static string ParseBoardColor(int i) {
+      return i == -1 ? "X" : "O";
     }
 
     public static string ParseBoardColor(string s) {
-      return s == "-1" ? "X" : "O";
+      return ParseBoardColor(int.Parse(s));
     }
 
     #region prepare batches

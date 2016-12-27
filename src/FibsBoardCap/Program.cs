@@ -3,18 +3,27 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Fibs;
+using System.Linq;
 
 namespace FibsBoardCap {
+  class Player {
+    public string Name { get; set; }
+    public string Opponent { get; set; }
+    public int Idle { get; set; }
+  }
+
   public class Program {
     public static void Main(string[] args) {
       (new Program()).RunAsync(args).GetAwaiter().GetResult();
     }
 
     FibsSession fibs;
-    List<string> players = new List<string>();
-    string player;
+    List<Player> players = new List<Player>();
+    Player player;
+    bool processing = true;
 
-    async Task SendAsync(string s) { Console.Error.WriteLine($"send: {s}"); await fibs.SendAsync(s); }
+    static void Log(string s) { Console.Error.WriteLine(s); }
+    async Task SendAsync(string s) { Log($"send: {s}"); await fibs.SendAsync(s); }
 
     async Task RunAsync(string[] args) {
       // FIBS test user
@@ -32,10 +41,18 @@ namespace FibsBoardCap {
         await Process(await fibs.LoginAsync(user, pw));
         await SendAsync("set boardstyle 3");
 
-        player = args.Length != 0 ? args[0] : players[(new Random()).Next(0, players.Count)];
-        await SendAsync($"watch {player}");
+        // pick the player provided on the command line or the one least idle
+        if (args.Length != 0) {
+          player = players.Find(p => string.Compare(p.Name, args[0], true) == 0);
+          if (player == null || player.Opponent == null) { Log($"{args[0]} not playing"); return; }
+        }
+        else {
+          player = players.Where(p => p.Opponent != null).OrderBy(p => p.Idle).First();
+        }
 
-        while (true) { await Process(await fibs.ReceiveAsync()); }
+        Log($"{player.Name}: idle {player.Idle} seconds");
+        await SendAsync($"watch {player.Name}");
+        while (processing) { await Process(await fibs.ReceiveAsync()); }
       }
     }
 
@@ -49,7 +66,7 @@ namespace FibsBoardCap {
         Debug.WriteLine("protocol error: clearing cache and unwatching");
         cache.Clear();
         if (player != null) {
-          await SendAsync($"unwatch {player}");
+          await SendAsync($"unwatch {player.Name}");
           player = null;
         }
       };
@@ -58,9 +75,9 @@ namespace FibsBoardCap {
         Debug.WriteLine($"{cm.Cookie}: {cm.Raw}");
         switch (cm.Cookie) {
           case FibsCookie.CLIP_WHO_INFO:
-            var name = cm.Crumbs["name"];
-            if (cm.Crumbs["opponent"] == "-") { players.Remove(name); }
-            else { players.Add(name); }
+            var player = new Player { Name = cm.Crumbs["name"], Opponent = cm.Crumbs["opponent"] == "-" ? null : cm.Crumbs["opponent"], Idle = int.Parse(cm.Crumbs["idle"]) };
+            players.RemoveAll(p => p.Name == player.Name);
+            players.Add(player);
             break;
 
           case FibsCookie.CLIP_OWN_INFO:
@@ -97,17 +114,22 @@ namespace FibsBoardCap {
             cache.Add(cm);
             if (cache.Count == 15) {
               Console.WriteLine(cache.ToJson());
+              Log(cache[0].Crumbs["board"]);
+              foreach (var line in cache.Skip(1).Select(l => l.Crumbs["raw"])) { Log(line); }
               cache.Clear();
             }
             break;
 
           case FibsCookie.FIBS_YouStopWatching:
-            player = cm.Crumbs["name"];
-            await SendAsync($"watch {player}");
+            player = players.Find(p => string.Compare(p.Name, cm.Crumbs["name"]) == 0);
+            if (player == null || player.Opponent == null) { Log($"{cm.Crumbs["name"]} not playing"); processing = false; return; }
+            await SendAsync($"watch {player.Name}");
             break;
 
           case FibsCookie.FIBS_NotDoingAnything:
-            throw new Exception($"{cm.Crumbs["name"]} is not doing anything interesting.");
+            Log($"{cm.Crumbs["name"]} is not doing anything interesting.");
+            processing = false;
+            return;
         }
       }
 
