@@ -38,6 +38,7 @@ namespace FibsTest {
     public int Score { get; private set; }
     public int Bar { get; private set; }
     public int Home { get; private set; }
+    public int[] Dice { get; private set; }
     public bool IsTurn { get; private set; }
 
     public PlayerInfo(string color, BoardCrumbs b) {
@@ -49,12 +50,14 @@ namespace FibsTest {
         Score = b.player1Score;
         Bar = b.player1Bar;
         Home = b.player1Home;
+        Dice = b.player1Dice == "0:0" ? null : b.player1Dice.Split(':').Select(s => int.Parse(s)).ToArray();
       }
       else {
         Name = b.player2;
         Score = b.player2Score;
         Bar = b.player2Bar;
         Home = b.player2Home;
+        Dice = b.player2Dice == "0:0" ? null : b.player2Dice.Split(':').Select(s => int.Parse(s)).ToArray();
       }
 
       IsTurn = CookieMonster.ParseTurnColor(b.turnColor) == Color;
@@ -105,15 +108,17 @@ namespace FibsTest {
   */
   public class FibsBoardTests {
 
-    static string[] RenderBoard(BoardCrumbs b) {
+    static string RenderBoard(BoardCrumbs b) {
       var lines = new StringBuilder[14];
       var playerO = new PlayerInfo("O", b);
       var playerX = new PlayerInfo("X", b);
 
-      Assert.True(playerO.IsTurn == true || playerX.IsTurn == true || (playerO.IsTurn == false && playerX.IsTurn == false));
       var playerTurn = playerO.IsTurn ? playerO : playerX.IsTurn ? playerX : null;
+      var turn = playerTurn.Dice == null ? $"turn: {playerTurn.Name}" : $"{playerTurn.Name} rolled {playerTurn.Dice[0]} {playerTurn.Dice[1]}.";
+      Assert.True(playerO.IsTurn == true || playerX.IsTurn == true || (playerO.IsTurn == false && playerX.IsTurn == false));
+      Assert.True(playerO.Dice == null || playerX.Dice == null || (playerO.Dice == null && playerX.Dice == null));
 
-      if (b.direction != 1) { return new string[] { "TODO" }; }
+      if (b.direction != 1) { return "TODO"; }
 
       // empty board for direction == 1
       lines[00] = new StringBuilder($"   +-1--2--3--4--5--6--------7--8--9-10-11-12-+ O: {playerO.Name} - score: {playerO.Score}");
@@ -129,7 +134,7 @@ namespace FibsTest {
       lines[10] = new StringBuilder($"   |                  |   |                   |");
       lines[11] = new StringBuilder($"   |                  |   |                   |");
       lines[12] = new StringBuilder($"   +24-23-22-21-20-19-------18-17-16-15-14-13-+ X: {playerX.Name} - score: {playerX.Score}");
-      lines[13] = new StringBuilder($"   BAR: O-{playerO.Bar} X-{playerX.Bar}   OFF: O-{playerO.Home} X-{playerX.Home}   Cube: {b.doublingCube}  turn: {playerTurn.Name}");
+      lines[13] = new StringBuilder($"   BAR: O-{playerO.Bar} X-{playerX.Bar}   OFF: O-{playerO.Home} X-{playerX.Home}   Cube: {b.doublingCube}  {turn}");
 
       // place the pieces for direction == 1
       int[] pipPieces = b.board.Split(':').Select(s => int.Parse(s)).ToArray();
@@ -148,7 +153,7 @@ namespace FibsTest {
             lines[i + 1][5 + (pip - 1) * 3] = color;
           }
 
-          if( pieces > 5 ) {
+          if (pieces > 5) {
             string pileup = pieces.ToString();
             lines[4 + 1][5 + (pip - 1) * 3] = pileup[0];
             Assert.True(pileup.Length == 1, "Not handling two-digit pileups");
@@ -192,29 +197,64 @@ namespace FibsTest {
         }
       }
 
+      // place the pieces on the bar (direction == 1)
+      Assert.True(playerO.Bar >= 0);
+      for (var o = 0; o != Math.Min(playerO.Bar, 5); ++o) {
+        lines[o + 1][24] = 'O';
+      }
+
+      if (playerO.Bar > 5) {
+        string pileup = playerO.Bar.ToString();
+        lines[4 + 1][24] = pileup[0];
+        Assert.True(pileup.Length == 1, "Not handling two-digit pileups");
+      }
+
+      Assert.True(playerX.Bar >= 0);
+      for (var x = 0; x != Math.Min(playerX.Bar, 5); ++x) {
+        lines[11 - x][24] = 'X';
+      }
+
+      if (playerX.Bar > 5) {
+        string pileup = playerX.Bar.ToString();
+        lines[7 - 1][24] = pileup[0];
+        Assert.True(pileup.Length == 1, "Nxt handling twx-digit pileups");
+      }
+
       Assert.Equal(15, piecesO + playerO.Bar + playerO.Home);
       Assert.Equal(15, piecesX + playerX.Bar + playerX.Home);
 
-      return lines.Select(sb=>sb.ToString()).ToArray();
+      return lines.Aggregate(new StringBuilder(), (sb, s) => sb.AppendLine(s.ToString())).ToString();
     }
 
     [Fact]
-    public static void BoardCaps1Render() {
-      foreach (var filename in Directory.EnumerateFiles("boardcaps", "*.json").Take(1)) {
-        foreach (var line in File.ReadLines(filename).Take(1)) {
-          var json = JArray.Parse(line);
+    public static void BoardCapsRender() {
+      File.Delete(@"c:\temp\boardLines.txt");
+      File.Delete(@"c:\temp\renderedBoard.txt");
+
+      foreach (var filename in Directory.EnumerateFiles("boardcaps", "*.json")) {
+        var lines = File.ReadLines(filename).ToArray();
+        for (var i = 0; i != lines.Length; ++i) {
+          if (lines[i][0] == '#') { continue; } // skip commented out lines
+          var json = JArray.Parse(lines[i]);
           var boardCrumbs = JsonConvert.DeserializeObject<BoardCrumbs>(json[0]["crumbs"].ToString());
+
+          // TODO: remove
+          if (boardCrumbs.direction != 1) { continue; }
+
           var boardLines = json
             .Skip(1)
             .Select(c => c["crumbs"]["raw"].ToString())
-            .ToArray();
+            .Aggregate(new StringBuilder(), (sb, s) => sb.AppendLine(s))
+            .ToString();
           var renderedBoard = RenderBoard(boardCrumbs);
-          for (var i = 0; i != boardLines.Length; ++i) {
-            Assert.Equal(boardLines[i], renderedBoard[i]);
+          if (boardLines != renderedBoard) {
+            File.WriteAllText(@"c:\temp\boardLines.txt", boardLines);
+            File.WriteAllText(@"c:\temp\renderedBoard.txt", renderedBoard);
+            Assert.True(false, $"file= {filename}, line= {i + 1}");
           }
         }
       }
     }
-
   }
+
 }
