@@ -90,7 +90,7 @@
       <!-- overflow pieces -->
       <!--<text x="260" y="100" fill="white" font-family="arial" text-anchor="middle" dominant-baseline="middle">4</text>-->
       <template is="dom-repeat" items="[[_overflows]]" as="o">
-        <text x$="[[o.pos.cx]]" y$="[[o.pos.cy]]" fill$="[[o.color]]" font-family="arial" text-anchor="middle" dominant-baseline="middle">[[o.count]]</text>
+        <text x$="[[o.pos.cx]]" y$="[[o.pos.cy]]" fill$="[[o.color]]" font-family="arial" text-anchor="middle" dominant-baseline="middle">[[o.color]]</text>
       </template>
 
       <!-- dice -->
@@ -119,8 +119,13 @@
       [[_player2Color(board.player1Color)]]: [[board.player2]]: [[board.player2Score]] point(s).
       [[_whosTurn(board.turnColor)]] turn.
     </div>
-    <!-- TEST: board cap file testing -->
-    <input type="file" on-change="handleFile" />
+    <div>
+      <!-- TEST: board cap file testing -->
+      <input type="file" on-change="_handleFile" />
+      <button on-tap="_prevTextBoard">&lt;==</button>
+      <button on-tap="_nextTextBoard">==&gt;</button>
+      <div style="font-family: Courier New, Courier, monospace">[[_textBoard]]</div>
+    </div>
   </template>
 
   <!-- NOTE: Needs to come before the call to Polymer() -->
@@ -139,17 +144,6 @@
         _spots: { computed: "_getSpots(board.turnColor)" },
         _cubes: { computed: "_getCubes(board.doublingCube)" },
         _homePieces: { computed: "_getHomePieces(board.player1Home, board.player2Home)" },
-      },
-
-      // TEST: board cap file testing
-      handleFile: function (e) {
-        let file = e.target.files[0];
-        let reader = new FileReader();
-        reader.onload = e => {
-          let json = e.target.result;
-          // TODO: parse the json and be read to pump it through the message stream
-        };
-        reader.readAsText(file);
       },
 
       ready: function () {
@@ -295,6 +289,48 @@
         let home2 = player2Home ? ys2.slice(0, player2Home).map(y=> { return { y: y, color: this._diceColor(this._player2Color(this.board.player1Color)) } }) : [];
 
         return home1.concat(home2);
+      },
+
+      // TEST: board cap file testing
+      _handleFile: function (e) {
+        let file = e.target.files[0];
+        let reader = new FileReader();
+        reader.onload = e => {
+          // split file into lines of JSON
+          this._boardLines = e.target.result.split("\r\n");
+          this._boardLinesIndex = 0;
+          this._showBoardLine();
+        };
+        reader.readAsText(file);
+      },
+
+      _showBoardLine: function() {
+        // JSON.parse(_boardLines[0])[1].crumbs.raw
+        if (this._boardLinesIndex < 0 || this.boardLinesIndex > (this._boardLines.length-1)) {
+          this._textBoard = "";
+          return;
+        }
+
+        let boardMessages = JSON.parse(this._boardLines[this._boardLinesIndex]);
+        let textBoard = "";
+        // ASSERT(boardMessages[0].cookie == FIBS_Board)
+        for (let i = 1; i != boardMessages.length; ++i) {
+          // ASSERT(boardMessages[i].cookie == FIBS_Unknown)
+          // TODO: bind to an array of strings in a list instead of raw HTML
+          textBoard += "<br />" + boardMessages[i].crumbs.raw;
+        }
+
+        this._textBoard = textBoard;
+      },
+
+      _prevTextBoard: function () {
+        --this._boardLinesIndex;
+        this._showBoardLine();
+      },
+
+      _nextTextBoard: function () {
+        ++this._boardLinesIndex;
+        this._showBoardLine();
       },
 
     });
