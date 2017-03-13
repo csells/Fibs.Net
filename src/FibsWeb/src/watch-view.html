@@ -2,7 +2,7 @@
 
 <dom-module id="watch-view">
   <template>
-    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="574" height="420">
+    <svg version="1.1" xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 574 420" height="200">
       <!-- frame -->
       <rect x="0" y="0" height="420" width="574" fill="white" stroke="black" stroke-width="5" />
 
@@ -123,8 +123,10 @@
       <!-- TEST: board cap file testing -->
       <input type="file" on-change="_handleFile" />
       <button on-tap="_prevTextBoard">&lt;==</button>
+      <span>[[_boardLinesIndex]]</span>
       <button on-tap="_nextTextBoard">==&gt;</button>
-      <div style="font-family: Courier New, Courier, monospace">[[_textBoard]]</div>
+      <br />
+      <textarea rows="15" cols="80" readonly style="font-family: Courier New, Courier, monospace; font-size:8pt;">[[_textBoard]]</textarea>
     </div>
   </template>
 
@@ -296,17 +298,20 @@
         let file = e.target.files[0];
         let reader = new FileReader();
         reader.onload = e => {
-          // split file into lines of JSON
+          // split file into lines of JSON (removing blank lines and commented-out lines)
           this._boardLines = e.target.result.split("\r\n");
+          for (let i = this._boardLines.length - 1; i >= 0; --i) {
+            if ((this._boardLines[i] == "") || (this._boardLines[i][0] == "#")) { this._boardLines.splice(i, 1); }
+          }
           this._boardLinesIndex = 0;
           this._showBoardLine();
         };
         reader.readAsText(file);
       },
 
-      _showBoardLine: function() {
+      _showBoardLine: function () {
         // JSON.parse(_boardLines[0])[1].crumbs.raw
-        if (this._boardLinesIndex < 0 || this.boardLinesIndex > (this._boardLines.length-1)) {
+        if (this._boardLinesIndex < 0 || this._boardLinesIndex >= this._boardLines.length) {
           this._textBoard = "";
           return;
         }
@@ -317,7 +322,7 @@
         for (let i = 1; i != boardMessages.length; ++i) {
           // ASSERT(boardMessages[i].cookie == FIBS_Unknown)
           // TODO: bind to an array of strings in a list instead of raw HTML
-          textBoard += "<br />" + boardMessages[i].crumbs.raw;
+          textBoard += boardMessages[i].crumbs.raw + "\r\n";
         }
 
         this._textBoard = textBoard;
