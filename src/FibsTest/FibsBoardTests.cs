@@ -307,8 +307,11 @@ namespace FibsTest {
 
     [Fact]
     public static void BoardCapsRender() {
-      File.Delete(@"c:\temp\boardLines.txt");
-      File.Delete(@"c:\temp\renderedBoard.txt");
+      string boardLinesPath = Path.Combine(Path.GetTempPath(), "boardLines.txt");
+      string renderedBoardPath = Path.Combine(Path.GetTempPath(), "renderedBoard.txt");
+      // Clean out files left over from earlier test runs.
+      File.Delete(boardLinesPath);
+      File.Delete(renderedBoardPath);
 
       foreach (var filename in Directory.EnumerateFiles("boardcaps", "*.json")) {
         var lines = File.ReadLines(filename).ToArray();
@@ -323,8 +326,8 @@ namespace FibsTest {
             .ToString();
           var renderedBoard = RenderBoard(boardCrumbs);
           if (boardLines != renderedBoard) {
-            File.WriteAllText(@"c:\temp\boardLines.txt", boardLines);
-            File.WriteAllText(@"c:\temp\renderedBoard.txt", renderedBoard);
+            File.WriteAllText(boardLinesPath, boardLines);
+            File.WriteAllText(renderedBoardPath, renderedBoard);
             Assert.True(false, $"file= {filename}, line= {i + 1}");
           }
         }
