@@ -12,7 +12,7 @@ namespace FibsProxy {
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory) {
-      loggerFactory.AddConsole(LogLevel.Debug);
+      loggerFactory.AddConsole(env.IsDevelopment() ? LogLevel.Debug : LogLevel.Error);
       if (env.IsDevelopment()) { app.UseDeveloperExceptionPage(); }
 
       app.UseDefaultFiles();
