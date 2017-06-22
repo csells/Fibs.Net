@@ -90,7 +90,7 @@
       <!-- overflow pieces -->
       <!--<text x="260" y="100" fill="white" font-family="arial" text-anchor="middle" dominant-baseline="middle">4</text>-->
       <template is="dom-repeat" items="[[_getOverflows(board.board)]]" as="o">
-        <text x$="[[o.pos.cx]]" y$="[[o.pos.cy]]" fill$="[[o.color]]" font-family="arial" text-anchor="middle" dominant-baseline="middle">[[o.color]]</text>
+        <text x$="[[o.pos.cx]]" y$="[[o.pos.cy]]" fill$="[[o.color]]" font-family="arial" text-anchor="middle" dominant-baseline="middle">[[o.count]]</text>
       </template>
 
       <template is="dom-if" if="[[_showDice(board)]]">
@@ -320,6 +320,7 @@
       _showBoardLine: function () {
         if (this._boardLinesIndex < 0 || this._boardLinesIndex >= this._boardLines.length) {
           this._textBoard = "";
+          this.board = null;
           return;
         }
 

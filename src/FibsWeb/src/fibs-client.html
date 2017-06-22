@@ -86,6 +86,7 @@
         automove: parseBool,
         away: parseBool,
         bell: parseBool,
+        boardstyle: parseInt,
         crawford: parseBool,
         double: parseBool,
         experience: parseInt,
@@ -232,7 +233,7 @@
           console.log(`setting: ${message.crumbs.name}= ${message.crumbs.value}`);
           let m = {};
           m[message.crumbs.name] = message.crumbs.value;
-          this._setCrumbSettings(m);
+          this._parsePropertyFromCrumbs("settings", this._settingsParsers, m);
           break;
       }
     },
