@@ -16,6 +16,11 @@
 
 <dom-module id="fibs-app">
   <template>
+    <style>
+      app-drawer {
+        --app-drawer-width: 100px;
+      }
+    </style>
     <fibs-client id="fibs-client" session="{{session}}" settings="{{settings}}" who="{{who}}" watching="{{watching}}"></fibs-client>
     <app-drawer-layout fullbleed>
       <!-- Drawer content -->
