@@ -291,11 +291,17 @@
     },
 
     _parsePropertyFromCrumbs: function (property, parsers, crumbs) {
+      let obj = {};
       Object.keys(crumbs).forEach(name => {
         let parse = parsers[name];
         if (!parse) { throw `no parser for ${name}`; }
-        this.set(`${property}.${name}`, parse(crumbs[name]));
+        obj[name] = parse(crumbs[name]);
       });
+
+      // trigger anyone looking for any change on the top-level property at all
+      // as well as all of the sub-properties
+      this.set(property, null);
+      this.set(property, obj);
     },
 
     _processWatch: function (message) {
