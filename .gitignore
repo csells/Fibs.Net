@@ -220,3 +220,7 @@ bower_components/
 
 ## .NET Core
 PrecompiledWeb/
+*.sqlite
+
+# VS Code
+.vscode
