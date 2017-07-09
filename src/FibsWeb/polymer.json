@@ -5,7 +5,7 @@
     "src/login-view.html",
     "src/settings-view.html"
   ],
-  "sources": [
+  "source": [
    "src/**/*",
    "images/**/*",
    "bower.json"
