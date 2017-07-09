@@ -8,22 +8,25 @@ const LoggedInLink = props => props.user ? props.children : null;
 const LoggedOutLink = props => props.user ? null : props.children;
 
 const LoggedInRoute = ({ component: Component, ...rest }) => (
-  <Route {...rest} render={props => (props.user
-    ? <Component {...props} />
-    : <Redirect to={{ pathname: '/login', state: { from: props.location } }} />
+  <Route {...rest} render={props => (rest["user"]
+      ? <Component {...props} />
+      : <Redirect to={{ pathname: '/login', state: { from: props.location } }} />
   )} />
 )
 
 // Is this needed? Ever time the user enters a URL manually, they're going to refresh the page anyway, losing the state...
 // EXCEPT: How will this interact with saving the user's login info between sessions?
 const LoggedOutRoute = ({ component: Component, ...rest }) => (
-  <Route {...rest} render={props => (props.user
+  <Route {...rest} render={props => (rest["user"]
     ? <Redirect to={{ pathname: '/logout', state: { from: props.location } }} />
     : <Component {...props} />
   )} />
 )
 
-const Login = withRouter(props => <button onClick={() => props.login("bob", "bob1", () => props.history.push("/"))}>Login</button>);
+const Login = withRouter(props => <button onClick={() => props.login("bob", "bob1", () => {
+    const {from} = props.location.state || {from: "/" };
+    props.history.push(from);
+  })}>Login</button>);
 const Logout = withRouter(props => <button onClick={() => props.logout(() => props.history.push("/"))}>Logout</button>);
 const Play = () => <div>Play!</div>;
 
@@ -34,7 +37,8 @@ class App extends Component {
   logout = (cb) => { this.setState({ user: "", pw: "" }); cb(); }
 
   render() {
-    let user = this.state.user;
+    const user = this.state.user;
+    console.log(`user: ${user}`);
 
     return (
       <Router>
@@ -60,7 +64,7 @@ class App extends Component {
             <LoggedInRoute user={user} exact path="/play" component={() => <Play />} />
             <Route render={() => <div>404</div>} />
           </Switch>
-          <div>user: {this.state.user}</div>
+          <div>user: {user}</div>
         </div>
       </Router>
     );
