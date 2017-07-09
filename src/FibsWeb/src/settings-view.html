@@ -5,12 +5,12 @@
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
 
 <dom-module id="settings-view">
-  <style>
-    paper-checkbox {
-      display: block;
-    }
-  </style>
   <template>
+    <style>
+      paper-checkbox {
+        display: block;
+      }
+    </style>
     <!-- NOTE: disabled properties can't be set by the user; they're needed for the app or don't make sense -->
     <paper-checkbox name="allowpip" checked="[[settings.allowpip]]" on-change="_toggle">allowpip</paper-checkbox>
     <paper-checkbox name="autoboard" checked="[[settings.autoboard]]" on-change="_toggle" disabled>autoboard</paper-checkbox>

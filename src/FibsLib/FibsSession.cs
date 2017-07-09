@@ -21,9 +21,10 @@ namespace Fibs {
     public async Task<CookieMessage[]> LoginAsync(string user, string password, CancellationToken cancel = default(CancellationToken)) {
       if (cancel == default(CancellationToken)) { cancel = new CancellationTokenSource(5000).Token; }
       var messages = new List<CookieMessage>();
-      messages.AddRange(await ExpectAsync(FibsCookie.FIBS_LoginPrompt, cancel));
+      messages.AddRange(await ExpectAsync(new FibsCookie[] { FibsCookie.FIBS_LoginPrompt }, cancel));
       await SendAsync($"login dotnetcli {FibsVersion} {user} {password}");
-      messages.AddRange(await ExpectAsync(FibsCookie.CLIP_MOTD_END, cancel));
+      messages.AddRange(await ExpectAsync(new FibsCookie[] { FibsCookie.CLIP_MOTD_END, FibsCookie.FIBS_FailedLogin }, cancel));
+      if (messages.Select(m => m.Cookie).Contains(FibsCookie.FIBS_FailedLogin)) { throw new FailedLoginException(user); }
       return messages.ToArray();
     }
 
@@ -53,17 +54,17 @@ namespace Fibs {
       return lines.Select(l => monster.EatCookie(l)).ToArray();
     }
 
-    async Task<CookieMessage[]> ExpectAsync(FibsCookie cookie, CancellationToken cancel) {
+    async Task<CookieMessage[]> ExpectAsync(FibsCookie[] cookies, CancellationToken cancel) {
       var allMessages = new List<CookieMessage>();
       while (!cancel.IsCancellationRequested) {
         var s = await queue.ReadAsync(cancel);
         var someMessages = Process(s);
         allMessages.AddRange(someMessages);
-        if (someMessages.Any(cm => cm.Cookie == cookie)) { return allMessages.ToArray(); }
+        if (someMessages.Any(cm => cookies.Contains(cm.Cookie))) { return allMessages.ToArray(); }
       }
 
       // I had such low expectations...
-      throw new Exception($"{cookie} not found");
+      throw new Exception($"None of these cookies found: {string.Join(", ", cookies)}");
     }
 
     // clean up, clean up, everybody do their share...
@@ -131,4 +132,8 @@ namespace Fibs {
 
   }
 
+  public class FailedLoginException : Exception {
+    public FailedLoginException(string user, Exception innerException = null) : base($"failed to login as {user}", innerException) {
+    }
+  }
 }

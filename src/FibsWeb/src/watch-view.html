@@ -2,7 +2,7 @@
 
 <dom-module id="watch-view">
   <template>
-    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="574" height="420">
+    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 574 420" height="200">
       <!-- frame -->
       <rect x="0" y="0" height="420" width="574" fill="white" stroke="black" stroke-width="5" />
 
@@ -83,33 +83,35 @@
       <rect x="520" y="20" height="180" width="32" fill="darkgreen" stroke="black" stroke-width="2" />
 
       <!-- pieces -->
-      <template is="dom-repeat" items="[[_pieces]]" as="p">
+      <template is="dom-repeat" items="[[_getPieces(board.board)]]" as="p">
         <circle cx$="[[p.pos.cx]]" cy$="[[p.pos.cy]]" r="14" fill$="[[p.color]]" stroke="black" stroke-width="2px" />
       </template>
 
       <!-- overflow pieces -->
       <!--<text x="260" y="100" fill="white" font-family="arial" text-anchor="middle" dominant-baseline="middle">4</text>-->
-      <template is="dom-repeat" items="[[_overflows]]" as="o">
+      <template is="dom-repeat" items="[[_getOverflows(board.board)]]" as="o">
         <text x$="[[o.pos.cx]]" y$="[[o.pos.cy]]" fill$="[[o.color]]" font-family="arial" text-anchor="middle" dominant-baseline="middle">[[o.count]]</text>
       </template>
 
-      <!-- dice -->
-      <rect x="332" y="186" height="48" width="48" fill$="[[_diceColor(board.turnColor)]]" stroke="black" stroke-width="2px" rx="10" ry="10" />
-      <rect x="404" y="186" height="48" width="48" fill$="[[_diceColor(board.turnColor)]]" stroke="black" stroke-width="2px" rx="10" ry="10" />
+      <template is="dom-if" if="[[_showDice(board)]]">
+        <!-- dice -->
+        <rect x="332" y="186" height="48" width="48" fill$="[[_diceColor(board.turnColor)]]" stroke="black" stroke-width="2px" rx="10" ry="10" />
+        <rect x="404" y="186" height="48" width="48" fill$="[[_diceColor(board.turnColor)]]" stroke="black" stroke-width="2px" rx="10" ry="10" />
 
-      <!-- dice spots -->
-      <template is="dom-repeat" items="[[_spots]]" as="s">
-        <circle cx$="[[s.cx]]" cy$="[[s.cy]]" fill$="[[_spotsColor(board.turnColor)]]" r="5" />
+        <!-- dice spots -->
+        <template is="dom-repeat" items="[[_getSpots(board.turnColor)]]" as="s">
+          <circle cx$="[[s.cx]]" cy$="[[s.cy]]" fill$="[[_spotsColor(board.turnColor)]]" r="5" />
+        </template>
       </template>
 
       <!-- cube -->
-      <template is="dom-repeat" items="[[_cubes]]" as="c">
+      <template is="dom-repeat" items="[[_getCubes(board.doublingCube)]]" as="c">
         <rect x$="[[c.rx]]" y$="[[c.ry]]" height="44" width="44" fill="white" stroke="black" stroke-width="2px" rx="10" ry="10" />
-        <text x$="[[c.tx]]" y$="[[c.tx]]" font-family="arial" text-anchor="middle" dominant-baseline="middle">[[board.doublingCube]]</text>
+        <text x$="[[c.tx]]" y$="[[c.ty]]" font-family="arial" text-anchor="middle" dominant-baseline="middle">[[board.doublingCube]]</text>
       </template>
 
       <!-- home -->
-      <template is="dom-repeat" items="[[_homePieces]]" as="h">
+      <template is="dom-repeat" items="[[_getHomePieces(board.player1Home, board.player2Home)]]" as="h">
         <rect x="522" y$="[[h.y]]" fill$="[[h.color]]" height="11" width="28" stroke="grey" stroke-width="2" />
       </template>
     </svg>
@@ -119,8 +121,15 @@
       [[_player2Color(board.player1Color)]]: [[board.player2]]: [[board.player2Score]] point(s).
       [[_whosTurn(board.turnColor)]] turn.
     </div>
-    <!-- TEST: board cap file testing -->
-    <input type="file" on-change="handleFile" />
+    <div>
+      <!-- TEST: board cap file testing -->
+      <input type="file" on-change="_handleFile" />
+      <button on-tap="_prevTextBoard">&lt;==</button>
+      <span>[[_boardLinesIndex]]</span>
+      <button on-tap="_nextTextBoard">==&gt;</button>
+      <br />
+      <textarea rows="15" cols="80" readonly style="font-family: Courier New, Courier, monospace; font-size:8pt;">[[_textBoard]]</textarea>
+    </div>
   </template>
 
   <!-- NOTE: Needs to come before the call to Polymer() -->
@@ -129,27 +138,13 @@
   <script src="svg-template-support.js"></script>
 
   <script>
+    function ASSERT(b, m) { if (!b) { throw new Error(m || "Assertion failed"); } }
+
     Polymer({
       is: "watch-view",
 
       properties: {
         board: Object,
-        _pieces: { computed: "_getPieces(board.board)" },
-        _overflows: { computed: "_getOverflows(board.board)" },
-        _spots: { computed: "_getSpots(board.turnColor)" },
-        _cubes: { computed: "_getCubes(board.doublingCube)" },
-        _homePieces: { computed: "_getHomePieces(board.player1Home, board.player2Home)" },
-      },
-
-      // TEST: board cap file testing
-      handleFile: function (e) {
-        let file = e.target.files[0];
-        let reader = new FileReader();
-        reader.onload = e => {
-          let json = e.target.result;
-          // TODO: parse the json and be read to pump it through the message stream
-        };
-        reader.readAsText(file);
       },
 
       ready: function () {
@@ -192,7 +187,9 @@
 
       },
 
-      // 26 numbers giving the board. Positions 0 and 25 represent the bars for the players.
+      // 26 numbers giving the board. Positions 0 and 25 are documented to represent the bars
+      // for the players, but they don't seem to match the other spot designated as the
+      // place with the bars (player1Bar, player2Bar), so should be ignored.
       // Positive numbers represent 0's pieces and negative numbers represent X's pieces.
       // e.g. 0:-2:0:0:0:0:5:0:3:0:0:0:-5:5:0:0:0:-3:0:-5:0:0:0:0:2:0
       // from http://www.fibs.com/fibs_interface.html#board_state
@@ -208,12 +205,6 @@
             pieces.push({ pos: pos, color: count < 0 ? "black" : "white" });
           }
         });
-
-        // TODO: remove -- just making sense of the FIBS protocol
-        let player1Bar = s.split(":")[0];
-        let player2Bar = s.split(":")[25];
-        if (player1Bar != this.board.player1Bar) { console.log(`split:player1Bar(${player1Bar}) != board:player1Bar(${this.board.player1Bar})`); }
-        if (player2Bar != this.board.player2Bar) { console.log(`split:player2Bar(${player2Bar}) != board:player2Bar(${this.board.player2Bar})`); }
 
         return pieces;
       },
@@ -244,6 +235,17 @@
         return turnColor == this.board.player1Color ? (this.board.player1 == "You" ? "Your" : this.board.player1 + "'s") : this.board.player2 + "'s";
       },
 
+      _showDice: function (board) {
+        if (!board) { return false; }
+        if (!board.player1Dice) { return false; }
+        if (board.player1Dice[0] == 0 && board.player2Dice[0] == 0) {
+          ASSERT(board.player1Dice[1] == 0 && board.player2Dice[1] == 0)
+          return false;
+        }
+
+        return true;
+      },
+
       _diceColor: function (turnColor) {
         return turnColor == "X" ? "black" : "white";
       },
@@ -253,8 +255,9 @@
       },
 
       _getSpots: function (turnColor) {
+        if (!this._showDice(this.board)) { return null; }
+        if (!turnColor) { return null; }
         let dice = turnColor == this.board.player1Color ? this.board.player1Dice : this.board.player2Dice;
-        if (!dice) { return null; }
 
         let cxsDice = [{ left: 344, middle: 356, right: 368 }, { left: 416, middle: 428, right: 440 }];
         let cysDice = [{ top: 198, middle: 210, bottom: 222 }, { top: 198, middle: 210, bottom: 222 }];
@@ -267,7 +270,7 @@
             case 4: return [{ cx: cxs.right, cy: cys.top }, { cx: cxs.left, cy: cys.bottom }, { cx: cxs.left, cy: cys.top }, { cx: cxs.right, cy: cys.bottom }];
             case 5: return [{ cx: cxs.right, cy: cys.top }, { cx: cxs.left, cy: cys.bottom }, { cx: cxs.left, cy: cys.top }, { cx: cxs.right, cy: cys.bottom }, { cx: cxs.middle, cy: cys.middle }];
             case 6: return [{ cx: cxs.right, cy: cys.top }, { cx: cxs.left, cy: cys.bottom }, { cx: cxs.left, cy: cys.top }, { cx: cxs.right, cy: cys.bottom }, { cx: cxs.right, cy: cys.middle }, { cx: cxs.left, cy: cys.middle }];
-            default: throw `unknown die: ${die}`;
+            default: throw `unknown die: ${die}`; // TODO: handle an exception from here during a watch
           }
         };
 
@@ -284,7 +287,8 @@
           /* either */  { rx: 238, ry: 186, tx: 260, ty: 210 },
         ];
 
-        return [cubes[(this.board.player1MayDouble ? 1 : 0) + (this.board.player2MayDouble ? 2 : 0)]];
+        let cube = cubes[(this.board.player1MayDouble ? 1 : 0) + (this.board.player2MayDouble ? 2 : 0)];
+        return cube == null ? cube : [cube];
       },
 
       _getHomePieces: function (player1Home, player2Home) {
@@ -295,6 +299,56 @@
         let home2 = player2Home ? ys2.slice(0, player2Home).map(y=> { return { y: y, color: this._diceColor(this._player2Color(this.board.player1Color)) } }) : [];
 
         return home1.concat(home2);
+      },
+
+      // TEST: board cap file testing
+      _handleFile: function (e) {
+        let file = e.target.files[0];
+        let reader = new FileReader();
+        reader.onload = e => {
+          // split file into lines of JSON (removing blank lines and commented-out lines)
+          this._boardLines = e.target.result.split("\r\n");
+          for (let i = this._boardLines.length - 1; i >= 0; --i) {
+            if ((this._boardLines[i] == "") || (this._boardLines[i][0] == "#")) { this._boardLines.splice(i, 1); }
+          }
+          this._boardLinesIndex = 0;
+          this._showBoardLine();
+        };
+        reader.readAsText(file);
+      },
+
+      _showBoardLine: function () {
+        if (this._boardLinesIndex < 0 || this._boardLinesIndex >= this._boardLines.length) {
+          this._textBoard = "";
+          this.board = null;
+          return;
+        }
+
+        // parse the separate board text lines into a full board for display
+        let boardMessages = JSON.parse(this._boardLines[this._boardLinesIndex]);
+        let textBoard = "";
+        ASSERT(boardMessages[0].cookie == "FIBS_Board")
+        for (let i = 1; i != boardMessages.length; ++i) {
+          ASSERT(boardMessages[i].cookie == "FIBS_Unknown")
+          textBoard += boardMessages[i].crumbs.raw + "\r\n";
+        }
+
+        this._textBoard = textBoard;
+
+        // parse board crumps into board object
+        //this._boardParsers
+        var client = window.getService("fibs-client");
+        client._parsePropertyFromCrumbs.call(this, "board", client._boardParsers, boardMessages[0].crumbs);
+      },
+
+      _prevTextBoard: function () {
+        --this._boardLinesIndex;
+        this._showBoardLine();
+      },
+
+      _nextTextBoard: function () {
+        ++this._boardLinesIndex;
+        this._showBoardLine();
       },
 
     });

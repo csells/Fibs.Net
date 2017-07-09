@@ -4,6 +4,7 @@
 ## Usage
 * Build Fibs.Net.sln: 
 
+  `C:\Fibs.Net\> dotnet restore`
   `C:\Fibs.Net\> msbuild Fibs.Net.sln`
 
 * Execute the FibsProxy project, which will set up a WebSocket proxy for fibs.com:4321 on port 5000:
