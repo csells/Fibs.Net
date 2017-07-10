@@ -20,7 +20,7 @@ export default class App extends Component {
     return (
       <Router>
         <div>
-          <Navbar collapseOnSelect>
+          <Navbar collapseOnSelect fixedTop>
             <Navbar.Header>
               <Navbar.Brand>Play FIBS!</Navbar.Brand>
               <Navbar.Toggle />
