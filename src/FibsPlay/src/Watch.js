@@ -1,5 +1,3 @@
 import React from 'react';
 
-const Watch = () => <div>Watch!</div>;
-
-export default Watch;
+export default function Watch() { return <div>Watch!</div>; }

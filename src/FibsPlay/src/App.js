@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
 import { Navbar, Nav, NavItem } from 'react-bootstrap'
 import { LinkContainer } from 'react-router-bootstrap'
-import { LoggedInLinkContainer, LoggedOutLinkContainer, LoggedInRoute, LoggedOutRoute, Login, Register, Logout } from "./Auth";
+import { LoggedInLinkContainer, LoggedOutLinkContainer, LoggedInRoute, Login, Register, Logout } from "./Auth";
 import './App.css';
 import Welcome from './Welcome';
 import Watch from './Watch';
@@ -37,8 +37,8 @@ export default class App extends Component {
           </Navbar>
           <Switch>
             <Route exact path="/" component={Welcome} />
-            <LoggedOutRoute user={user} exact path="/login" component={() => <Login login={this.login} />} />
-            <LoggedOutRoute user={user} exact path="/register" component={() => <Register register={this.register} />} />
+            <Route exact path="/login" component={() => <Login login={this.login} />} />
+            <Route exact path="/register" component={() => <Register register={this.register} />} />
             <LoggedInRoute user={user} exact path="/logout" component={() => <Logout logout={this.logout} />} />
             <LoggedInRoute user={user} exact path="/watch" component={() => <Watch />} />
             <Route render={() => <div>404</div>} />
