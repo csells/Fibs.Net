@@ -6,6 +6,7 @@ using Fibs;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
+using Shouldly;
 
 namespace FibsTest {
   class BoardCrumbs {
@@ -92,7 +93,8 @@ namespace FibsTest {
     }
 
     static void RenderBoardBackwards(BoardCrumbs b, StringBuilder[] lines, Player playerO, Player playerX, string turn, string cube) {
-      Assert.Equal(b.direction, -1);
+      Assert.Equal(-1, b.direction);
+      //b.direction.ShouldBe(-1);
 
       lines[00] = new StringBuilder($"   +13-14-15-16-17-18-------19-20-21-22-23-24-+ X: {playerX.Name} - score: {playerX.Score}");
       lines[01] = new StringBuilder($"   |                  |   |                   |");
@@ -199,7 +201,7 @@ namespace FibsTest {
     }
 
     static void RenderBoardForwards(BoardCrumbs b, StringBuilder[] lines, Player playerO, Player playerX, string turn, string cube) {
-      Assert.Equal(b.direction, 1);
+      Assert.Equal(1, b.direction);
 
       lines[00] = new StringBuilder($"   +-1--2--3--4--5--6--------7--8--9-10-11-12-+ O: {playerO.Name} - score: {playerO.Score}");
       lines[01] = new StringBuilder($"   |                  |   |                   |");

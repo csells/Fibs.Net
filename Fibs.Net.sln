@@ -1,24 +1,21 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26906.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{825E75CE-43CD-4B51-8DE2-8E38A60D38CB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0A31D401-FCA9-4A0A-B775-46D3C4A3A1D2}"
-	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
-	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "FibsLib", "src\FibsLib\FibsLib.xproj", "{57A3D38E-D34B-4F56-AAC6-E97DAFB9D684}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FibsLib", "src\FibsLib\FibsLib.csproj", "{57A3D38E-D34B-4F56-AAC6-E97DAFB9D684}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "FibsCli", "src\FibsCli\FibsCli.xproj", "{CEC0FBFE-208C-4648-9E24-03ABB0A8C69B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FibsCli", "src\FibsCli\FibsCli.csproj", "{CEC0FBFE-208C-4648-9E24-03ABB0A8C69B}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "FibsProxy", "src\FibsProxy\FibsProxy.xproj", "{3C6D493B-BE41-4207-902A-3E34862ADA8E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FibsProxy", "src\FibsProxy\FibsProxy.csproj", "{3C6D493B-BE41-4207-902A-3E34862ADA8E}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "FibsTest", "src\FibsTest\FibsTest.xproj", "{1ED663BE-C795-4E8D-865D-7E6A6040D121}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FibsTest", "src\FibsTest\FibsTest.csproj", "{1ED663BE-C795-4E8D-865D-7E6A6040D121}"
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "FibsWeb(1)", "src\FibsWeb\", "{C280F936-FDC7-46A3-857E-FB3D341B74E8}"
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "FibsWeb", "src\FibsWeb\", "{C280F936-FDC7-46A3-857E-FB3D341B74E8}"
 	ProjectSection(WebsiteProperties) = preProject
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_50805"
@@ -39,7 +36,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "FibsWeb(1)", "src\FibsWeb\"
 		SlnRelativePath = "src\FibsWeb\"
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "FibsBoardCap", "src\FibsBoardCap\FibsBoardCap.xproj", "{119CA2B0-8634-4279-8765-3FD35F4C8C3F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FibsBoardCap", "src\FibsBoardCap\FibsBoardCap.csproj", "{119CA2B0-8634-4279-8765-3FD35F4C8C3F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -82,5 +79,8 @@ Global
 		{1ED663BE-C795-4E8D-865D-7E6A6040D121} = {825E75CE-43CD-4B51-8DE2-8E38A60D38CB}
 		{C280F936-FDC7-46A3-857E-FB3D341B74E8} = {825E75CE-43CD-4B51-8DE2-8E38A60D38CB}
 		{119CA2B0-8634-4279-8765-3FD35F4C8C3F} = {825E75CE-43CD-4B51-8DE2-8E38A60D38CB}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {72FE6B03-50EF-40B2-BA08-5C499944A15B}
 	EndGlobalSection
 EndGlobal
