@@ -1,5 +1,5 @@
 ﻿# Fibs.Net
-.NET Core library, proxy and tests as well as web client for [First Internet Backgammon Server (FIBS)](http://fibs.com); all very much under development
+.NET Core library, proxy and tests as well as web client for [First Internet Backgammon Server (FIBS)](http://fibs.com); all very much under development - patches are welcome.
 
 ## Usage
 * Build Fibs.Net.sln: 
@@ -25,4 +25,4 @@
 
   `puttytel telnet://fibs.com:4321`
 
-Enjoy!
+Enjoy Fibs.Net!
