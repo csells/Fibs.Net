@@ -1,51 +1,54 @@
 <template>
-  <form v-on:submit="login">
-      <div><span>user: <input v-model="user" :disabled=inputDisabled /></span></div>
-      <div><span>password: <input v-model="pass" type="password" :disabled=inputDisabled /></span></div>
-      <div><input type="submit" v-model="submitName" :disabled=submitDisabled /></div>
-      <div>status: {{session.status}}</div>
-      <div>error: {{session.error}}</div>
-      <div>last login: {{session.lastLogin}}</div>
-      <div>last host: {{session.lastHost}}</div>
-    </form>
+  <div>
+    <form v-on:submit="login">
+        <div><span>user: <input v-model="user" :disabled=inputDisabled /></span></div>
+        <div><span>password: <input v-model="pass" type="password" :disabled=inputDisabled /></span></div>
+        <div><input type="submit" v-model="submitName" :disabled=submitDisabled /></div>
+        <div>status: {{client.session.status}}</div>
+        <div>error: {{client.session.error}}</div>
+        <div>last login: {{client.session.lastLogin}}</div>
+        <div>last host: {{client.session.lastHost}}</div>
+      </form>
+      <p v-for="(line, i) in client.session.motd" :key="i">{{line}}</p>
+    </div>
   </template>
 
 <script>
-import Session from "../session";
+import FibsClient from "../FibsClient";
 
 export default {
   data() {
     return {
       user: "dotnetcli", // HACK: devmode
       pass: "dotnetcli", // HACK: devmode
-      session: new Session()
+      client: new FibsClient()
     };
   },
 
   computed: {
     submitName: function() {
-      return this.session.status === "closed" ? "Login" : "Logout";
+      return this.client.session.status === "closed" ? "Login" : "Logout";
     },
 
     submitDisabled: function() {
       return (
-        this.session.status === "closed" &&
+        this.client.session.status === "closed" &&
         (this.user === "" || this.pass === "")
       );
     },
 
     inputDisabled: function() {
-      return this.session.status === "opened";
+      return this.client.session.status !== "closed";
     }
   },
 
   methods: {
     login: function(e) {
       e.preventDefault();
-      if (this.session.status === "closed") {
-        this.session.login(this.user, this.pass);
+      if (this.client.session.status === "closed") {
+        this.client.login(this.user, this.pass);
       } else {
-        this.session.logout();
+        this.client.logout();
       }
     }
   }

@@ -28,5 +28,7 @@ module.exports = {
     'semi': 0,
     'comma-dangle': 0,
     'space-before-function-paren': 0,
+    'spaced-comment': 0,
+    'brace-style': 0,
   }
 }
