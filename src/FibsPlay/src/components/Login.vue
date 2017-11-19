@@ -11,25 +11,14 @@
   </template>
 
 <script>
-let session = {
-  status: "closed",
-  error: null,
-  lastLogin: null,
-  lastHost: null,
-  login: function(user, pass) {
-    this.status = "opened";
-  },
-  logout: function() {
-    this.status = "closed";
-  }
-};
+import Session from "../session";
 
 export default {
   data() {
     return {
       user: "dotnetcli", // HACK: devmode
       pass: "dotnetcli", // HACK: devmode
-      session
+      session: new Session()
     };
   },
 
@@ -40,7 +29,8 @@ export default {
 
     submitDisabled: function() {
       return (
-        this.session.status === "closed" && (this.user === "" || this.pass === "")
+        this.session.status === "closed" &&
+        (this.user === "" || this.pass === "")
       );
     },
 
@@ -52,10 +42,10 @@ export default {
   methods: {
     login: function(e) {
       e.preventDefault();
-      if (session.status === "closed") {
-        session.login(this.user, this.pass);
+      if (this.session.status === "closed") {
+        this.session.login(this.user, this.pass);
       } else {
-        session.logout();
+        this.session.logout();
       }
     }
   }

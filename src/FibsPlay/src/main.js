@@ -16,8 +16,9 @@ new Vue({
       path: '/',
       component: Login
     },
-    ]
+    ],
+    mode: "history",
   }),
   template: '<App/>',
-  components: { App }
-})
+  components: { App },
+});
