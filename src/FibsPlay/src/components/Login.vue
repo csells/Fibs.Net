@@ -14,14 +14,12 @@
   </template>
 
 <script>
-import FibsClient from "../FibsClient";
-
 export default {
   data() {
     return {
       user: "dotnetcli", // HACK: devmode
       pass: "dotnetcli", // HACK: devmode
-      client: new FibsClient()
+      client: this.$root.$data.client
     };
   },
 
