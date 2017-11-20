@@ -242,6 +242,7 @@ export default class FibsClient {
 
     // trigger anyone looking for any change on the top-level property at all
     // as well as all of the sub-properties
+    // TODO: Needed for VueJS?
     this[property] = null;
     this[property] = obj;
   }

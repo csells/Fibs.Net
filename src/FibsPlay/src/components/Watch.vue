@@ -89,10 +89,47 @@
 </template>
 
 <script>
+let cysTop = [35, 64, 93, 122, 151];
+let cysBottom = [385, 356, 327, 298, 269];
+
+let poses = [
+  { cx: 260, cys: [164, 132, 100] }, // player 1 bar
+
+  // bottom
+  { cx: 481, cys: cysBottom }, // pip 1
+  { cx: 445, cys: cysBottom }, // pip 2
+  { cx: 409, cys: cysBottom }, // pip 3
+  { cx: 373, cys: cysBottom }, // pip 4
+  { cx: 337, cys: cysBottom }, // pip 5
+  { cx: 301, cys: cysBottom }, // pip 6
+  { cx: 219, cys: cysBottom }, // pip 7
+  { cx: 182, cys: cysBottom }, // pip 8
+  { cx: 145, cys: cysBottom }, // pip 9
+  { cx: 109, cys: cysBottom }, // pip 10
+  { cx: 73, cys: cysBottom }, // pip 11
+  { cx: 37, cys: cysBottom }, // pip 12
+
+  // top
+  { cx: 37, cys: cysTop }, // pip 13
+  { cx: 73, cys: cysTop }, // pip 14
+  { cx: 109, cys: cysTop }, // pip 15
+  { cx: 145, cys: cysTop }, // pip 16
+  { cx: 182, cys: cysTop }, // pip 17
+  { cx: 219, cys: cysTop }, // pip 18
+  { cx: 301, cys: cysTop }, // pip 19
+  { cx: 337, cys: cysTop }, // pip 20
+  { cx: 373, cys: cysTop }, // pip 21
+  { cx: 409, cys: cysTop }, // pip 22
+  { cx: 445, cys: cysTop }, // pip 23
+  { cx: 481, cys: cysTop }, // pip 24
+
+  { cx: 260, cys: [256, 288, 320] }, // player 2 bar
+];
+
 export default {
   data() {
     return {
-      client: this.$root.$data.client
+      client: this.$root.$data.client,
     };
   },
 
@@ -104,18 +141,19 @@ export default {
     // e.g. 0:-2:0:0:0:0:5:0:3:0:0:0:-5:5:0:0:0:-3:0:-5:0:0:0:0:2:0
     // from http://www.fibs.com/fibs_interface.html#board_state
     pieces: function() {
-      if (!this.client.board) { return; }
+      if (!this.client.watching.board) { return; }
 
       let pieces = [];
-      this.client.board.board.split(":").forEach((ch, pip) => {
+      this.client.watching.board.split(":").forEach((ch, pip) => {
         let count = parseInt(ch); // piece count for the current pip
-        let maxCount = this._poses[pip].cys.length;
+        let maxCount = poses[pip].cys.length;
         for (let i = 0; i !== Math.min(Math.abs(count), maxCount); ++i) {
-          let pos = { cx: this._poses[pip].cx, cy: this._poses[pip].cys[i] };
+          let pos = { cx: poses[pip].cx, cy: poses[pip].cys[i] };
           pieces.push({ pos: pos, color: count < 0 ? "black" : "white" });
         }
       });
 
+      console.log(`pieces: ${pieces.length}`);
       return pieces;
     }
   },
@@ -123,7 +161,8 @@ export default {
   // this seems to happen every time the route shows this component
   mounted: function(e) {
     console.log(`mounted: ${this.$route.params.name}`);
-    this.client.watch(this.$route.params.name);
+    this.client.look(this.$route.params.name); // get initial board
+    this.client.watch(this.$route.params.name); // get notifications on board changes
   },
 
   // doesn't seem to do anything...
