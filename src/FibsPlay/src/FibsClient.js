@@ -71,6 +71,7 @@ export default class FibsClient {
 
     this._socket.onopen = e => {
       console.log("socket: logging in as " + user);
+      this.session.user = user;
       this.session.status = "opened";
       this._send("login " + user + " " + pass);
     };
@@ -210,6 +211,11 @@ export default class FibsClient {
         let i = this.who.findIndex(w => w.name === person.name);
         if (i === -1) { this.who.push(person); }
         else { this.who.splice(i, 1, person); }
+        break;
+
+      case "CLIP_LOGOUT":
+        let j = this.who.findIndex(w => w.name === message.crumbs.name);
+        if (j !== -1) { this.who.splice(j, 1); }
         break;
     }
   }

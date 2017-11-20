@@ -4,6 +4,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import App from '@/components/App'
 import Login from '@/components/Login'
+import Who from '@/components/Who'
 import FibsClient from './FibsClient';
 
 Vue.use(Router)
@@ -14,7 +15,8 @@ new Vue({
   el: '#app',
   router: new Router({
     routes: [
-      { path: '/', component: Login },
+      { name: "login", path: '/', component: Login },
+      { name: "who", path: '/who', component: Who },
     ],
     mode: "history",
   }),

@@ -30,5 +30,6 @@ module.exports = {
     'space-before-function-paren': 0,
     'spaced-comment': 0,
     'brace-style': 0,
+    'standard/object-curly-even-spacing': 0
   }
 }
