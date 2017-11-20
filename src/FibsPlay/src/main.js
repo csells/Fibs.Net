@@ -5,6 +5,8 @@ import Router from 'vue-router'
 import App from '@/components/App'
 import Login from '@/components/Login'
 import Who from '@/components/Who'
+import Watch from '@/components/Watch'
+import Play from '@/components/Play'
 import FibsClient from './FibsClient';
 
 Vue.use(Router)
@@ -17,6 +19,8 @@ new Vue({
     routes: [
       { name: "login", path: '/', component: Login },
       { name: "who", path: '/who', component: Who },
+      { name: "watch", path: '/watch/:name', component: Watch },
+      { name: "play", path: '/play/:name', component: Play },
     ],
     mode: "history",
   }),
