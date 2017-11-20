@@ -81,6 +81,9 @@
       <!-- player2 home -->
       <rect x="520" y="20" height="180" width="32" fill="darkgreen" stroke="black" stroke-width="2" />
 
+      <!-- pieces -->
+      <circle v-for="p in pieces" :cx="p.pos.cx" :cy="p.pos.cy" r="14" :fill="p.color" stroke="black" stroke-width="2px" />
+
     </svg>
   </div>
 </template>
@@ -92,5 +95,42 @@ export default {
       client: this.$root.$data.client
     };
   },
+
+  computed: {
+    // 26 numbers giving the board. Positions 0 and 25 are documented to represent the bars
+    // for the players, but they don't seem to match the other spot designated as the
+    // place with the bars (player1Bar, player2Bar), so should be ignored.
+    // Positive numbers represent 0's pieces and negative numbers represent X's pieces.
+    // e.g. 0:-2:0:0:0:0:5:0:3:0:0:0:-5:5:0:0:0:-3:0:-5:0:0:0:0:2:0
+    // from http://www.fibs.com/fibs_interface.html#board_state
+    pieces: function() {
+      if (!this.client.board) { return; }
+
+      let pieces = [];
+      this.client.board.board.split(":").forEach((ch, pip) => {
+        let count = parseInt(ch); // piece count for the current pip
+        let maxCount = this._poses[pip].cys.length;
+        for (let i = 0; i !== Math.min(Math.abs(count), maxCount); ++i) {
+          let pos = { cx: this._poses[pip].cx, cy: this._poses[pip].cys[i] };
+          pieces.push({ pos: pos, color: count < 0 ? "black" : "white" });
+        }
+      });
+
+      return pieces;
+    }
+  },
+
+  // this seems to happen every time the route shows this component
+  mounted: function(e) {
+    console.log(`mounted: ${this.$route.params.name}`);
+    this.client.watch(this.$route.params.name);
+  },
+
+  // doesn't seem to do anything...
+  // watch: {
+  //   '$route': function(newRoute) {
+  //     console.log(`$route changed: ${this.$route.params.name}`);
+  //   }
+  // }
 };
 </script>
