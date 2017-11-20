@@ -153,16 +153,19 @@ export default {
         }
       });
 
-      console.log(`pieces: ${pieces.length}`);
       return pieces;
     }
   },
 
   // this seems to happen every time the route shows this component
-  mounted: function(e) {
+  mounted: function() {
     console.log(`mounted: ${this.$route.params.name}`);
     this.client.look(this.$route.params.name); // get initial board
     this.client.watch(this.$route.params.name); // get notifications on board changes
+  },
+
+  beforeDestroy: function() {
+    this.client.unwatch();
   },
 
   // doesn't seem to do anything...

@@ -228,8 +228,12 @@ export default class FibsClient {
   }
 
   watch(name) {
-    if (name) { this._send(`watch ${name}`); }
-    else { this._send("unwatch"); }
+    if (!name) { throw new Error("watch: need a name"); }
+    this._send(`watch ${name}`);
+  }
+
+  unwatch() {
+    this._send("unwatch");
   }
 
   _parsePropertyFromCrumbs(property, parsers, crumbs) {
