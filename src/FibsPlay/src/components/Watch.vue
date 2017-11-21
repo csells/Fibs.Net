@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h1>watch {{$route.params.name}}</h1>
     <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 574 420" height="400">
       <!-- frame -->
       <rect x="0" y="0" height="420" width="574" fill="white" stroke="black" stroke-width="5" />
@@ -95,17 +94,22 @@
         <!-- dice spots -->
         <circle v-for="s in diceSpots" :cx="s.cx" :cy="s.cy" :fill="diceSpotsColor" r="5" />
       </template>
-    </svg>
 
-    <!-- TEST: board cap file testing -->
-    <!-- <div v-if="TEST">
-      <input type="file" @change="handleFile" />
-      <button @click="prevTextBoard">&lt;==</button>
-      <span>{{boardLinesIndex}}</span>
-      <button @click="nextTextBoard">==&gt;</button>
-      <br />
-      <textarea rows="15" cols="80" readonly style="font-family: Courier New, Courier, monospace; font-size:8pt;">{{textBoard}}</textarea>
-    </div> -->
+      <!-- cube -->
+      <template v-for="c in cubes">
+        <rect :x="c.rx" :y="c.ry" height="44" width="44" fill="white" stroke="black" stroke-width="2px" rx="10" ry="10" />
+        <text :x="c.tx" :y="c.ty" font-family="arial" text-anchor="middle" dominant-baseline="middle">{{client.watching.doublingCube}}</text>
+      </template>
+
+      <!-- home -->
+      <rect v-for="h in homePieces" x="522" :y="h.y" :fill="h.color" height="11" width="28" stroke="grey" stroke-width="2" />
+    </svg>
+     <div>
+      {{client.watching.matchLength}}-point match.
+      {{letterColor(client.watching.player1Color)}}: {{client.watching.player1}}: {{client.watching.player1Score}} point(s).
+      {{letterColor(player2Color(client.watching.player1Color))}}: {{client.watching.player2}}: {{client.watching.player2Score}} point(s).
+      {{whosTurn}} turn.
+    </div>
   </div>
 </template>
 
@@ -152,7 +156,6 @@ function ASSERT(b, m) { if (!b) { throw new Error(m || "Assertion failed"); } }
 export default {
   data() {
     return {
-      TEST: true,
       client: this.$root.$data.client,
     };
   },
@@ -240,6 +243,49 @@ export default {
 
       return spots(dice[0], cxsDice[0], cysDice[0]).concat(spots(dice[1], cxsDice[1], cysDice[1]));
     },
+
+    cubes: function () {
+      let game = this.client.watching;
+      if (!game) { return null; }
+
+      let doublingCube = game.doublingCube;
+      if (!doublingCube) { return null; }
+
+      let cubeOpts = [
+        /* neither */ null,
+        /* player1 */ { rx: 238, ry: 352, tx: 260, ty: 376 },
+        /* player2 */ { rx: 238, ry: 24, tx: 260, ty: 48 },
+        /* either */ { rx: 238, ry: 186, tx: 260, ty: 210 },
+      ];
+
+      let cube = cubeOpts[(game.player1MayDouble ? 1 : 0) + (game.player2MayDouble ? 2 : 0)];
+      return cube == null ? null : [cube];
+    },
+
+    homePieces: function () {
+      let game = this.client.watching;
+      if (!game) { return null; }
+
+      let player1Home = game.player1Home;
+      let player2Home = game.player2Home;
+      let ys1 = [22, 33, 44, 55, 66, 77, 88, 99, 110, 121, 132, 143, 154, 165, 176];
+      let ys2 = [387, 376, 365, 354, 343, 332, 321, 310, 299, 288, 277, 266, 255, 244, 233];
+      let home1 = player1Home ? ys1.slice(0, player1Home).map(y => { return { y: y, color: this.letterColor(game.player1Color) } }) : [];
+      let home2 = player2Home ? ys2.slice(0, player2Home).map(y => { return { y: y, color: this.letterColor(this.player2Color(game.player1Color)) } }) : [];
+      return home1.concat(home2);
+    },
+
+    whosTurn: function () {
+      let game = this.client.watching;
+      if (!game) { return "game over"; }
+      if (!game.turnColor) { return "game over" };
+      return game.turnColor === game.player1Color ? (game.player1 === "You" ? "Your" : game.player1 + "'s") : game.player2 + "'s";
+    },
+  },
+
+  methods: {
+    player2Color: function (player1Color) { return player1Color === "X" ? "O" : "X"; },
+    letterColor: function (letter) { return letter === "X" ? "black" : "white"; },
   },
 
   // this seems to happen every time the route shows this component
@@ -251,12 +297,5 @@ export default {
   beforeDestroy: function() {
     this.client.unwatch();
   },
-
-  // doesn't seem to do anything...
-  // watch: {
-  //   '$route': function(newRoute) {
-  //     console.log(`$route changed: ${this.$route.params.name}`);
-  //   }
-  // }
 };
 </script>
