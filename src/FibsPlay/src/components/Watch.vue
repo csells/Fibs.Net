@@ -84,7 +84,28 @@
       <!-- pieces -->
       <circle v-for="p in pieces" :cx="p.pos.cx" :cy="p.pos.cy" r="14" :fill="p.color" stroke="black" stroke-width="2px" />
 
+      <!-- overflow pieces -->
+      <text v-for="o in overflows" :x="o.pos.cx" :y="o.pos.cy" :fill="o.color" font-family="arial" text-anchor="middle" dominant-baseline="middle">{{o.count}}</text>
+      
+      <template v-if="shouldShowDice">
+        <!-- dice -->
+        <rect x="332" y="186" height="48" width="48" :fill="diceColor" stroke="black" stroke-width="2px" rx="10" ry="10" />
+        <rect x="404" y="186" height="48" width="48" :fill="diceColor" stroke="black" stroke-width="2px" rx="10" ry="10" />
+
+        <!-- dice spots -->
+        <circle v-for="s in diceSpots" :cx="s.cx" :cy="s.cy" :fill="diceSpotsColor" r="5" />
+      </template>
     </svg>
+
+    <!-- TEST: board cap file testing -->
+    <!-- <div v-if="TEST">
+      <input type="file" @change="handleFile" />
+      <button @click="prevTextBoard">&lt;==</button>
+      <span>{{boardLinesIndex}}</span>
+      <button @click="nextTextBoard">==&gt;</button>
+      <br />
+      <textarea rows="15" cols="80" readonly style="font-family: Courier New, Courier, monospace; font-size:8pt;">{{textBoard}}</textarea>
+    </div> -->
   </div>
 </template>
 
@@ -126,9 +147,12 @@ let poses = [
   { cx: 260, cys: [256, 288, 320] }, // player 2 bar
 ];
 
+function ASSERT(b, m) { if (!b) { throw new Error(m || "Assertion failed"); } }
+
 export default {
   data() {
     return {
+      TEST: true,
       client: this.$root.$data.client,
     };
   },
@@ -154,14 +178,74 @@ export default {
       });
 
       return pieces;
-    }
+    },
+
+    overflows: function() {
+      if (!this.client.watching.board) { return; }
+
+      let overflows = [];
+      this.client.watching.board.split(":").forEach((ch, pip) => {
+        let count = parseInt(ch); // piece count for the current pip
+        let maxCount = poses[pip].cys.length;
+        if (Math.abs(count) > maxCount) {
+          let pos = { cx: poses[pip].cx, cy: poses[pip].cys[maxCount - 1] };
+          overflows.push({ pos: pos, color: count < 0 ? "white" : "black", count: Math.abs(count) });
+        }
+      });
+      return overflows;
+    },
+
+    shouldShowDice: function () {
+      let game = this.client.watching;
+      if (!game) { return false; }
+      if (!game.player1Dice) { return false; }
+      if (game.player1Dice[0] === 0 && game.player2Dice[0] === 0) {
+        ASSERT(game.player1Dice[1] === 0 && game.player2Dice[1] === 0)
+        return false;
+      }
+
+      return true;
+    },
+
+    diceColor: function () {
+      ASSERT(this.client.watching);
+      return this.client.watching.turnColor === "X" ? "black" : "white";
+    },
+
+    diceSpotsColor: function () {
+      ASSERT(this.client.watching);
+      return this.client.watching.turnColor === "X" ? "white" : "black";
+    },
+
+    diceSpots: function () {
+      let game = this.client.watching;
+      if (!game) { return false; }
+      if (!game.turnColor) { return null; }
+      let dice = game.turnColor === game.player1Color ? game.player1Dice : game.player2Dice;
+
+      let cxsDice = [{ left: 344, middle: 356, right: 368 }, { left: 416, middle: 428, right: 440 }];
+      let cysDice = [{ top: 198, middle: 210, bottom: 222 }, { top: 198, middle: 210, bottom: 222 }];
+
+      let spots = (die, cxs, cys) => {
+        switch (die) {
+          case 1: return [{ cx: cxs.middle, cy: cys.middle }];
+          case 2: return [{ cx: cxs.right, cy: cys.top }, { cx: cxs.left, cy: cys.bottom }];
+          case 3: return [{ cx: cxs.right, cy: cys.top }, { cx: cxs.middle, cy: cys.middle }, { cx: cxs.left, cy: cys.bottom }];
+          case 4: return [{ cx: cxs.right, cy: cys.top }, { cx: cxs.left, cy: cys.bottom }, { cx: cxs.left, cy: cys.top }, { cx: cxs.right, cy: cys.bottom }];
+          case 5: return [{ cx: cxs.right, cy: cys.top }, { cx: cxs.left, cy: cys.bottom }, { cx: cxs.left, cy: cys.top }, { cx: cxs.right, cy: cys.bottom }, { cx: cxs.middle, cy: cys.middle }];
+          case 6: return [{ cx: cxs.right, cy: cys.top }, { cx: cxs.left, cy: cys.bottom }, { cx: cxs.left, cy: cys.top }, { cx: cxs.right, cy: cys.bottom }, { cx: cxs.right, cy: cys.middle }, { cx: cxs.left, cy: cys.middle }];
+          default: throw new Error(`unknown die: ${die}`); // TODO: handle an exception from here during a watch
+        }
+      };
+
+      return spots(dice[0], cxsDice[0], cysDice[0]).concat(spots(dice[1], cxsDice[1], cysDice[1]));
+    },
   },
 
   // this seems to happen every time the route shows this component
   mounted: function() {
     console.log(`mounted: ${this.$route.params.name}`);
-    this.client.look(this.$route.params.name); // get initial board
-    this.client.watch(this.$route.params.name); // get notifications on board changes
+    this.client.watch(this.$route.params.name);
   },
 
   beforeDestroy: function() {

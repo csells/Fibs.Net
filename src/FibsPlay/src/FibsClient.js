@@ -222,17 +222,15 @@ export default class FibsClient {
   //#endregion
 
   //#region watch
-  look(name) {
-    if (!name) { throw new Error("look: need a name"); }
-    this._send(`look ${name}`);
-  }
-
   watch(name) {
     if (!name) { throw new Error("watch: need a name"); }
-    this._send(`watch ${name}`);
+    this.watching = {};
+    this._send(`look ${name}`); // get initial board immediately
+    this._send(`watch ${name}`); // watch for board changes
   }
 
   unwatch() {
+    this.watching = {};
     this._send("unwatch");
   }
 
