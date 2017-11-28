@@ -18,9 +18,9 @@
         <th>experience</th>
         <!--<th>idle</th>
         <th>login</th>
-        <th>hostName</th>
+        <th>hostName</th>-->
         <th>client</th>
-        <th>email</th>-->
+        <!--<th>email</th>-->
         <th>action</th>
       </tr>
       <tr v-for="person in people" :key="person.name">
@@ -33,9 +33,9 @@
         <td>{{person.experience}}</td>
         <!--<td>{{person.idle}}</td>
         <td>{{person.login}}</td>
-        <td>{{person.hostName}}</td>
+        <td>{{person.hostName}}</td>-->
         <td>{{person.client}}</td>
-        <td>{{person.email}}</td>-->
+        <!--<td>{{person.email}}</td>-->
         <td v-if="canPlay(person)"><router-link :to="{ name: 'play', params: { name: person.name } }">Play</router-link></td>
         <td v-else-if="canWatch(person)"><router-link :to="{ name: 'watch', params: { name: person.name } }">Watch</router-link></td>
       </tr>

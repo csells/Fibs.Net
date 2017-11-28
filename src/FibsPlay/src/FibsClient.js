@@ -254,6 +254,11 @@ export default class FibsClient {
       case "FIBS_Board":
         this._parsePropertyFromCrumbs("watching", this._boardParsers, message.crumbs);
         break;
+      case "FIBS_PlayerMoves": // Tyke moves 17-21 19-21 .
+        console.log(`${message.crumbs.player} moves ${message.crumbs.moves}`);
+        break;
+      case "FIBS_PlayerCantMove": // smilingeyes can't move.
+        console.log(`${message.crumbs.player} can't move`);
     }
   }
   //#endregion

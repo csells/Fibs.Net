@@ -298,7 +298,7 @@ namespace FibsTest {
       var s = "           Goodbye.";
       var cm = monster.EatCookie(s);
       Assert.Equal(FibsCookie.FIBS_Goodbye, cm.Cookie);
-      Assert.Equal(s, cm.Crumbs["message"]);
+      Assert.Equal("Goodbye.", cm.Crumbs["message"]);
     }
 
     [Fact]
@@ -459,6 +459,7 @@ namespace FibsTest {
       Assert.Equal("none", cm.Crumbs["value"]);
     }
 
+    [Fact]
     public void FIBS_RedoublesChangeToNumber() {
       var monster = CreateLoggedInCookieMonster();
       var s = "Value of 'redoubles' set to 42.";
@@ -478,6 +479,7 @@ namespace FibsTest {
       Assert.Equal("unlimited", cm.Crumbs["value"]);
     }
 
+    [Fact]
     public void FIBS_TimezoneChange() {
       var monster = CreateLoggedInCookieMonster();
       var s = "Value of 'timezone' set to America/Los_Angeles.";
@@ -617,6 +619,55 @@ namespace FibsTest {
       var cm = monster.EatCookie(s);
       Assert.Equal(FibsCookie.FIBS_NotDoingAnything, cm.Cookie);
       Assert.Equal("bonehead", cm.Crumbs["name"]);
+    }
+
+    [Fact]
+    public void FIBS_PlayerMoves4() {
+      var monster = CreateLoggedInCookieMonster();
+      var s = "Tyke moves 19-23 19-23 20-24 20-24 .";
+      var cm = monster.EatCookie(s);
+      Assert.Equal(FibsCookie.FIBS_PlayerMoves, cm.Cookie);
+      Assert.Equal("Tyke", cm.Crumbs["player"]);
+      Assert.Equal("19-23 19-23 20-24 20-24", cm.Crumbs["moves"]);
+    }
+
+    [Fact]
+    public void FIBS_PlayerMoves1() {
+      var monster = CreateLoggedInCookieMonster();
+      var s = "Tyke moves 19-23 .";
+      var cm = monster.EatCookie(s);
+      Assert.Equal(FibsCookie.FIBS_PlayerMoves, cm.Cookie);
+      Assert.Equal("Tyke", cm.Crumbs["player"]);
+      Assert.Equal("19-23", cm.Crumbs["moves"]);
+    }
+
+    [Fact]
+    public void FIBS_PlayerMoves2() {
+      var monster = CreateLoggedInCookieMonster();
+      var s = "Tyke moves 19-23 19-23 .";
+      var cm = monster.EatCookie(s);
+      Assert.Equal(FibsCookie.FIBS_PlayerMoves, cm.Cookie);
+      Assert.Equal("Tyke", cm.Crumbs["player"]);
+      Assert.Equal("19-23 19-23", cm.Crumbs["moves"]);
+    }
+
+    [Fact]
+    public void FIBS_PlayerMoves3() {
+      var monster = CreateLoggedInCookieMonster();
+      var s = "Tyke moves 19-23 19-23 20-24 .";
+      var cm = monster.EatCookie(s);
+      Assert.Equal(FibsCookie.FIBS_PlayerMoves, cm.Cookie);
+      Assert.Equal("Tyke", cm.Crumbs["player"]);
+      Assert.Equal("19-23 19-23 20-24", cm.Crumbs["moves"]);
+    }
+
+    [Fact]
+    public void FIBS_PlayerCantMove() {
+      var monster = CreateLoggedInCookieMonster();
+      var s = "smilingeyes can't move.";
+      var cm = monster.EatCookie(s);
+      Assert.Equal(FibsCookie.FIBS_PlayerCantMove, cm.Cookie);
+      Assert.Equal("smilingeyes", cm.Crumbs["player"]);
     }
 
   }

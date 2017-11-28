@@ -75,7 +75,6 @@ namespace Fibs {
     // or commands get silently dropped
     class CommandQueue : IDisposable {
       bool awaitingResponse = false;
-      int whoInfoCount = 0;
       Queue<string> cmdQueue = new Queue<string>();
       TcpClient telnet = new TcpClient();
       byte[] readBuffer = new byte[4096];

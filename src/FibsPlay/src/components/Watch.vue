@@ -268,8 +268,11 @@ export default {
 
       let player1Home = game.player1Home;
       let player2Home = game.player2Home;
+
+      // BUG: sometimes this are flipped
       let ys1 = [22, 33, 44, 55, 66, 77, 88, 99, 110, 121, 132, 143, 154, 165, 176];
       let ys2 = [387, 376, 365, 354, 343, 332, 321, 310, 299, 288, 277, 266, 255, 244, 233];
+
       let home1 = player1Home ? ys1.slice(0, player1Home).map(y => { return { y: y, color: this.letterColor(game.player1Color) } }) : [];
       let home2 = player2Home ? ys2.slice(0, player2Home).map(y => { return { y: y, color: this.letterColor(this.player2Color(game.player1Color)) } }) : [];
       return home1.concat(home2);
