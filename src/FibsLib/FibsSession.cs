@@ -11,14 +11,19 @@ namespace Fibs {
   // Known hosts: fibs.com:4321 (default), tigergammon.com:4321
   public class FibsSession : IDisposable {
     static string FibsVersion = "1008";
+    string host;
+    int port;
     CookieMonster monster = new CookieMonster();
     string leftovers = "";
     CommandQueue queue = new CommandQueue();
 
-    public FibsSession(string host = "fibs.com", int port = 4321) { queue.Connect(host, port); }
-    public bool IsConnected => queue.IsConnected;
+    public FibsSession(string host = "fibs.com", int port = 4321) {
+      this.host = host;
+      this.port = port;
+    }
 
     public async Task<CookieMessage[]> LoginAsync(string user, string password, CancellationToken cancel = default(CancellationToken)) {
+      await queue.ConnectAsync(host, port);
       if (cancel == default(CancellationToken)) { cancel = new CancellationTokenSource(5000).Token; }
       var messages = new List<CookieMessage>();
       messages.AddRange(await ExpectAsync(new FibsCookie[] { FibsCookie.FIBS_LoginPrompt }, cancel));
@@ -79,10 +84,8 @@ namespace Fibs {
       TcpClient telnet = new TcpClient();
       byte[] readBuffer = new byte[4096];
 
-      public bool IsConnected { get { return telnet.Connected; } }
-
-      internal void Connect(string host, int port) {
-        telnet.Client.Connect(host, port);
+      internal async Task ConnectAsync(string host, int port) {
+        await telnet.Client.ConnectAsync(host, port);
         if (!telnet.Connected) { throw new Exception($"cannot connect to {host} on {port}"); }
       }
 
