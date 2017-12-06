@@ -108,7 +108,7 @@
       {{client.watching.matchLength}}-point match.
       {{letterColor(client.watching.player1Color)}}: {{client.watching.player1}}: {{client.watching.player1Score}} point(s).
       {{letterColor(player2Color(client.watching.player1Color))}}: {{client.watching.player2}}: {{client.watching.player2Score}} point(s).
-      {{whosTurn}} turn.
+      {{whosTurn}}.
     </div>
   </div>
 </template>
@@ -282,7 +282,7 @@ export default {
       let game = this.client.watching;
       if (!game) { return "game over"; }
       if (!game.turnColor) { return "game over" };
-      return game.turnColor === game.player1Color ? (game.player1 === "You" ? "Your" : game.player1 + "'s") : game.player2 + "'s";
+      return game.turnColor === game.player1Color ? (game.player1 === "You" ? "Your turn" : game.player1 + "'s turn") : game.player2 + "'s turn";
     },
   },
 
