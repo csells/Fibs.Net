@@ -1,15 +1,15 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Net.WebSockets;
-using System.Threading;
+﻿using Fibs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Fibs;
-using System.Text;
-using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Diagnostics;
 using System.Linq;
-using Microsoft.Extensions.Logging;
+using System.Net.WebSockets;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace FibsProxy {
   // from http://zbrad.github.io/tools/wscore/
@@ -17,8 +17,7 @@ namespace FibsProxy {
   public class SocketHandler {
     private readonly ILogger _logger;
 
-    public SocketHandler(ILogger<SocketHandler> logger)
-    {
+    public SocketHandler(ILogger<SocketHandler> logger) {
       _logger = logger;
     }
 
@@ -27,12 +26,10 @@ namespace FibsProxy {
       var socket = await hc.WebSockets.AcceptWebSocketAsync();
       var logger = (ILogger<SocketHandler>)provider
         .GetService(typeof(ILogger<SocketHandler>));
-      try
-      {
+      try {
         await (new SocketHandler(logger)).FibsLoop(socket);
       }
-      finally
-      {
+      finally {
         logger.LogDebug("Exited FibsLoop().");
       }
     }
@@ -92,7 +89,7 @@ namespace FibsProxy {
             _logger.LogDebug("Received a message from web socket.");
             socketInput = await socketReceiveTask;
 
-            if(socketInput.MessageType == WebSocketMessageType.Close) {
+            if (socketInput.MessageType == WebSocketMessageType.Close) {
               await socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", noCancel);
               continue;
             }
@@ -135,7 +132,7 @@ namespace FibsProxy {
 
               if (messages.Any(cm => cm.Cookie == FibsCookie.FIBS_Goodbye)) {
                 _logger.LogDebug("Received Goodbye from FIBS.");
-                cancelRead.Cancel();                
+                cancelRead.Cancel();
                 break;
               }
             }

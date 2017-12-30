@@ -2,9 +2,11 @@
   "ExpandedNodes": [
     "",
     "\\src",
-    "\\src\\FibsTest",
+    "\\src\\FibsPlay",
+    "\\src\\FibsPlay\\src",
+    "\\src\\FibsPlay\\src\\components",
     "\\src\\FibsTest\\boardcaps"
   ],
-  "SelectedNode": "\\src\\FibsTest\\boardcaps\\cap1.json",
+  "SelectedNode": "\\src\\FibsPlay\\src\\components\\Watch.vue",
   "PreviewInSolutionExplorer": false
 }
