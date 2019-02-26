@@ -1,0 +1,1 @@
+@java -classpath %CLASSPATH%;../../lib/hsqldb.jar org.hsqldb.Server -silent false -trace true -database jibs

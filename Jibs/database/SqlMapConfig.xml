@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE sqlMapConfig PUBLIC "-//iBATIS.com//DTD SQL Map Config 2.0//EN" "http://www.ibatis.com/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+	<settings useStatementNamespaces="true" />
+	<transactionManager type="JDBC">
+	    <dataSource type="SIMPLE">
+	    	<property value="org.hsqldb.jdbcDriver" name="JDBC.Driver"/>
+	     	<property value="jdbc:hsqldb:file:../database/hsqldb/jibs" name="JDBC.ConnectionURL"/>
+	      	<property value="sa" name="JDBC.Username"/>
+	      	<property value="" name="JDBC.Password"/>
+	      	<property value="15" name="Pool.MaximumActiveConnections"/>
+	      	<property value="15" name="Pool.MaximumIdleConnections"/>
+	      	<property value="1000" name="Pool.MaximumWait"/>
+	    </dataSource>
+  	</transactionManager>
+
+  	<sqlMap resource="database/Player.xml"/>
+  	<sqlMap resource="database/Saved_Games.xml"/>
+
+</sqlMapConfig>
+

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap 
+          PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" 
+          "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="SavedGames">
+
+<select id="checkSavedGame" resultClass="java.lang.Integer">
+SELECT COUNT(*) FROM SAVED_GAMES WHERE (PLAYER_A=#player_A# AND PLAYER_B=#player_B#) OR (PLAYER_A=#player_B# AND PLAYER_B=#player_A#)
+</select>
+
+<delete id="deleteSavedGame" parameterClass="net.sourceforge.jibs.util.SavedGameParam"  >
+DELETE FROM SAVED_GAMES WHERE (PLAYER_A=#player_A# AND PLAYER_B=#player_B#) OR (PLAYER_A=#player_B# AND PLAYER_B=#player_A#)
+</delete>
+
+<insert id="saveGame">
+	INSERT INTO SAVED_GAMES(PLAYER_A,SAVED_DATE,PLAYER_B,BOARD,MATCHLENGTH,TURN,MATCHVERSION) 
+	VALUES(#player_A#,#savedDate#,#player_B#,#board#,#matchlength#,#turn#,#matchVersion#)
+</insert>
+
+<select id="loadSavedGame" resultClass="net.sourceforge.jibs.util.SavedGameParam" >
+SELECT PLAYER_A,SAVED_DATE,PLAYER_B,BOARD,MATCHLENGTH,TURN,MATCHVERSION FROM SAVED_GAMES 
+WHERE (PLAYER_A=#player_A# AND PLAYER_B=#player_B#) OR (PLAYER_A=#player_B# AND PLAYER_B=#player_A#)
+</select>
+
+</sqlMap>
